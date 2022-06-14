@@ -6,27 +6,15 @@ import Pages.Tutorial as T
 import Browser
 import Browser.Navigation as Nav
 import Url
-import Url.Parser as UParser exposing ((<?>), top, s, map, parse, oneOf)
-import Url.Parser.Query as UQParser
+import Url.Builder as UB
+import Url.Parser as UParser exposing (parse)
+import Url.Parser.Query as UQParser exposing (string)
 import Element exposing (..)
 import Element.Background as Background
 import Element.Border as Border
-import Element.Events exposing (onClick, onMouseEnter, onMouseLeave)
 import Element.Font as Font
 import Element.Input as Input
 import Colors.Opaque exposing (..)
-import Maybe.Extra exposing (toList)
-import Url.Builder as UB
-
-
----- APP ----
-
-
-title : String
-title = "LMHTFY"
-
-
----- MODEL ----
 
 
 type alias Model = 
@@ -48,15 +36,10 @@ init url key =
         Nothing -> ( model, Nav.pushUrl model.key "/" )
         Just Nothing -> ( model, Cmd.none )
         Just (Just q) -> ( { model | page = TutorialPage <| T.init q }, Cmd.none )
-        
+
 
 parseUrl : Url.Url -> Maybe (Maybe String)
-parseUrl url =
-    let urlParser = UParser.map identity (UParser.query <| UQParser.string "q")
-    in parse urlParser url
-
-
----- UPDATE ----
+parseUrl url = parse (UParser.query <| UQParser.string "q") url
 
 
 type Msg
@@ -93,24 +76,22 @@ tutorialLink : String -> String
 tutorialLink query = UB.absolute [] [ UB.string "q" query ]
 
 
----- VIEW ----
-
-
 view : Model -> Browser.Document Msg
 view model =
-    let 
-        content = case model.page of
+    let content = case model.page of
             QueryPage m -> Q.view m |> Element.map QueryMsg
             TutorialPage m -> T.view m |> Element.map TutorialMsg
     in 
         { title = title
         , body = [ 
-            layout [ width fill, centerX ] 
+            layout [ width fill
+                   , centerX 
+                   ] 
                 <| column 
                     [ spacingXY 0 20
                     , paddingXY 20 20
                     , centerX 
-                    , width (fill |> maximum (600))
+                    , width (fill |> maximum (800))
                     ]
                     [ navBar
                     , el [ paddingXY 10 10, width fill] content
@@ -129,7 +110,9 @@ navBar =
         [ el [ alignLeft ] <| text title
         ]
 
----- PROGRAM ----
+
+title : String 
+title = "LMHTFY"
 
 
 main : Program () Model Msg

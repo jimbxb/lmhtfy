@@ -14,10 +14,12 @@ import Html as H exposing (Html, a, div)
 
 import Maybe.Extra exposing (toList)
 
+
 type alias Model = 
     { url : String
     , query : String
     , link : Maybe String }
+
 
 type Msg 
     = QueryChanged String
@@ -25,12 +27,19 @@ type Msg
     | GenerateLink
     | TryItOut 
 
+
 type OutMsg 
     = Goto String
     | Nop
 
+
 init : String -> String -> Maybe String -> Model
-init u q l = { url = u, query = q, link = l }
+init url query link = 
+    { url = url
+    , query = query
+    , link = link 
+    }
+
 
 update : Msg -> Model -> ( Model, OutMsg )
 update msg model = 
@@ -44,8 +53,14 @@ update msg model =
 view : Model -> Element Msg
 view model = 
     let emptyQuery = model.query == ""
-    in column [ width fill, spacingXY 0 20 ] 
-     <| [ I.text [ alignRight, width fill ] 
+    in column [ width fill
+              , spacingXY 0 20 
+              ] 
+     <| [ I.search [ width fill
+                   , Font.alignLeft
+                   , spacingXY 20 0 
+                   , centerY
+                   ] 
             { onChange = QueryChanged
             , text = model.query
             , placeholder = Nothing
@@ -56,7 +71,7 @@ view model =
               , width fill
               , alignRight 
               ] 
-            [ I.button [alignRight]
+            [ I.button [ alignRight ]
                 { onPress = Just <| if emptyQuery then ClearLink else GenerateLink
                 , label = text "Generate Link"
                 }
@@ -65,14 +80,14 @@ view model =
                 , label = text "Try It Out"
                 }
             ]
-        ] ++ toList (Maybe.map (\l -> 
+        ] ++ Maybe.Extra.toList (Maybe.map (\l -> 
             let params = [ UB.string "q" l ]
-            in el [ width fill, clip, htmlAttribute <| HA.style "flex-basis" "auto" ]
+            in el [ width fill
+                  , clip
+                  , htmlAttribute <| HA.style "flex-basis" "auto" 
+                  ]
                 <| link [ alignLeft ] 
                     { url = UB.absolute [] params
                     , label = text <| model.url ++ UB.relative [] params
                     }
-                
-                
-        
         ) model.link)
