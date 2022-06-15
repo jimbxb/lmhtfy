@@ -69,6 +69,7 @@ update msg model =
             let ( newTmodel, cmdMsg ) = T.update tmsg tmodel
                 cmd = case cmdMsg of
                     T.Goto url -> Nav.pushUrl model.key url
+                    T.ExternalGoto url -> Nav.load url
                     T.Nop -> Cmd.none 
             in ( { model | page = TutorialPage newTmodel }, cmd )
         _ -> ( model, Cmd.none )
@@ -92,19 +93,23 @@ view model =
                      <| column 
                         [ centerX 
                         , width fill
+                        , height fill
                         ]
-                        [ navBar
+                        [ topBar
                         , el [ paddingXY 10 20
                              , width (fill |> maximum (800))
                              , centerX
+                             , height fill
                              ] content
+                        , bottomBar
                         ]
                  ]
         }
 
 
-navBar = 
+topBar = 
     el [ width fill 
+       , height (px 60)
        , Border.widthEach { bottom = 1, top = 0, left = 0, right = 0 }
        , Border.color C.black
        , Background.color C.white
@@ -112,7 +117,9 @@ navBar =
        ]
      <| row [ width (fill |> maximum (800))
             , paddingXY 10 10
+            , height fill
             , centerX
+            , centerY
             ]
             [ image []
                 { src = "images/lmhtfy.svg"
@@ -120,6 +127,38 @@ navBar =
                 } 
             ]
 
+bottomBar = 
+    el [ width fill 
+       , height (px 60)
+       , Border.widthEach { bottom = 0, top = 1, left = 0, right = 0 }
+       , Border.color C.black
+       , Background.color C.white
+       , Border.shadow { blur = 10, color = C.darkGrey, offset = (0, 0), size = 2 }
+       ]
+     <| row [ width (fill |> maximum (800))
+            , height fill
+            , paddingXY 10 10
+            , centerX
+            ]
+            [ el [ alignRight
+                 , centerY
+                 , Font.size 12 
+                 ] 
+                <| row []
+                    [ text "© "
+                    , link [ Font.color C.mediumPurple ] 
+                        { url = "https://github.com/jimbxb"
+                        , label = text "James Barnes"
+                        }
+                    , text ", 2021. "
+                    , text "LMHTFY is not endorsed by, sponsored by, or affiliated with "
+                    , link [ Font.color C.mediumPurple ]
+                        { url = "https://www.haskell.org/"
+                        , label = text "Haskell.org"
+                        }
+                    , text "."
+                    ]
+            ]
 
 title : String 
 title = "LMHTFY"

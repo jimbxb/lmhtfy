@@ -24,6 +24,7 @@ type Msg
 
 type OutMsg 
     = Goto String
+    | ExternalGoto String
     | Nop
 
 
@@ -36,8 +37,8 @@ update msg model =
     case msg of
         Replay -> ( model, Nop )
         Query -> ( model, Goto "/" )
-        HoogleHome -> ( model, Goto hoogleHome )
-        HoogleIt -> ( model, Goto <| hoogleQuery model.query )
+        HoogleHome -> ( model, ExternalGoto hoogleHome )
+        HoogleIt -> ( model, ExternalGoto <| hoogleQuery model.query )
         
 
 view : Model -> Element Msg
@@ -50,7 +51,9 @@ view model =
                 , width fill
                 ]
          <| List.indexedMap 
-                (\i x -> C.text [ clip, htmlAttribute <| HA.style "flex-basis" "auto" ] [text <| String.fromInt (i + 1) ++ ". ", x])
+                (\i x -> C.text [ clip
+                                , htmlAttribute <| HA.style "flex-basis" "auto" 
+                                ] [text <| String.fromInt (i + 1) ++ ". ", x])
             [ row [] 
                 [ text "Visit "
                 , link [ Font.color C.mediumPurple ] 
