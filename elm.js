@@ -6087,8 +6087,7 @@ var $elm$url$Url$Builder$string = F2(
 var $author$project$Main$tutorialLink = function (query) {
 	return A2(
 		$elm$url$Url$Builder$relative,
-		_List_fromArray(
-			['lmhtfy']),
+		_List_Nil,
 		_List_fromArray(
 			[
 				A2($elm$url$Url$Builder$string, 'q', query)
@@ -12988,7 +12987,10 @@ var $author$project$Main$topBar = A2(
 			[
 				A2(
 				$mdgriffith$elm_ui$Element$image,
-				_List_Nil,
+				_List_fromArray(
+					[
+						$mdgriffith$elm_ui$Element$height($mdgriffith$elm_ui$Element$fill)
+					]),
 				{cu: 'LMHTFY Logo', di: 'public/images/lmhtfy.svg'})
 			])));
 var $author$project$Pages$Query$ClearLink = {$: 1};
@@ -13000,10 +13002,6 @@ var $author$project$Pages$Query$QueryChanged = function (a) {
 	return {$: 0, a: a};
 };
 var $author$project$Pages$Query$TryItOut = {$: 4};
-var $elm$url$Url$Builder$absolute = F2(
-	function (pathSegments, parameters) {
-		return '/' + (A2($elm$core$String$join, '/', pathSegments) + $elm$url$Url$Builder$toQuery(parameters));
-	});
 var $mdgriffith$elm_ui$Internal$Model$Left = 0;
 var $mdgriffith$elm_ui$Element$alignLeft = $mdgriffith$elm_ui$Internal$Model$AlignX(0);
 var $mdgriffith$elm_ui$Internal$Model$Right = 2;
@@ -14399,10 +14397,10 @@ var $author$project$Pages$Query$view = function (model) {
 			$elm_community$maybe_extra$Maybe$Extra$toList(
 				A2(
 					$elm$core$Maybe$map,
-					function (l) {
+					function (q) {
 						var params = _List_fromArray(
 							[
-								A2($elm$url$Url$Builder$string, 'q', l)
+								A2($elm$url$Url$Builder$string, 'q', q)
 							]);
 						var href = _Utils_ap(
 							model.bK,
@@ -14430,7 +14428,7 @@ var $author$project$Pages$Query$view = function (model) {
 											_Utils_ap(
 												model.bK,
 												A2($elm$url$Url$Builder$relative, _List_Nil, params))),
-										bK: A2($elm$url$Url$Builder$absolute, _List_Nil, params)
+										bK: A2($elm$url$Url$Builder$relative, _List_Nil, params)
 									})
 								]));
 					},

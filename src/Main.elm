@@ -82,7 +82,7 @@ update msg model =
 
 
 tutorialLink : String -> String
-tutorialLink query = UB.relative ["lmhtfy"] [ UB.string "q" query ]
+tutorialLink query = UB.relative [] [ UB.string "q" query ]
 
 
 view : Model -> Browser.Document Msg
@@ -127,7 +127,7 @@ topBar =
             , centerX
             , centerY
             ]
-            [ image []
+            [ image [ height fill ]
                 { src = "public/images/lmhtfy.svg"
                 , description = "LMHTFY Logo"
                 } 

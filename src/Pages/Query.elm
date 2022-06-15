@@ -91,14 +91,14 @@ view model =
               , label = text "Try It Out"
               }
             ]
-        ] ++ Maybe.Extra.toList (Maybe.map (\l -> 
-            let params = [ UB.string "q" l ]
+        ] ++ Maybe.Extra.toList (Maybe.map (\q -> 
+            let params = [ UB.string "q" q ]
                 href = model.url ++ UB.relative [] params
             in S.text [ clip
                       , htmlAttribute <| HA.style "flex-basis" "auto"
                       ]
                     [ link [ alignLeft, htmlAttribute <| id "link" ] 
-                        { url = UB.absolute [] params
+                        { url = UB.relative [] params
                         , label = text <| model.url ++ UB.relative [] params
                         }
                     ]
