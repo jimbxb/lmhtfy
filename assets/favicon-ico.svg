@@ -2,13 +2,13 @@
 <!-- Created with Inkscape (http://www.inkscape.org/) -->
 
 <svg
-   width="62.285034mm"
-   height="40.270519mm"
-   viewBox="0 0 62.285035 40.270519"
+   width="64mm"
+   height="64mm"
+   viewBox="0 0 64.000001 64"
    version="1.1"
    id="svg5"
    inkscape:version="1.1.1 (3bf5ae0d25, 2021-09-20)"
-   sodipodi:docname="lmhtfy-ico.svg"
+   sodipodi:docname="favicon-ico.svg"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns="http://www.w3.org/2000/svg"
@@ -23,20 +23,22 @@
      inkscape:pagecheckerboard="1"
      inkscape:document-units="mm"
      showgrid="false"
-     showguides="false"
+     showguides="true"
      fit-margin-top="0"
      fit-margin-left="0"
      fit-margin-right="0"
      fit-margin-bottom="0"
-     inkscape:zoom="2.1971895"
-     inkscape:cx="188.42253"
-     inkscape:cy="19.342892"
+     inkscape:zoom="1.5536476"
+     inkscape:cx="86.892292"
+     inkscape:cy="53.100845"
      inkscape:window-width="1920"
      inkscape:window-height="1057"
      inkscape:window-x="1912"
      inkscape:window-y="2"
      inkscape:window-maximized="1"
-     inkscape:current-layer="text30643" />
+     inkscape:current-layer="text30643"
+     units="mm"
+     width="241.88977px" />
   <defs
      id="defs2">
     <rect
@@ -111,7 +113,8 @@
        id="text30643"
        style="font-weight:bold;font-size:27.4426px;line-height:1.25;font-family:'Trebuchet MS';-inkscape-font-specification:'Trebuchet MS Bold';fill:#323232;stroke-width:0.343031">
       <g
-         id="g53532">
+         id="g53532"
+         transform="translate(0.85748335,11.864739)">
         <g
            id="g848"
            transform="matrix(0.26458333,0,0,0.26458333,60.332078,252.01101)">
@@ -145,23 +148,23 @@
          id="path48048"
          clip-path="url(#clipPath48543)"
          style="fill:#8f4e8b;fill-opacity:1"
-         transform="translate(-51.961133,20.642521)" />
+         transform="translate(-51.10365,32.50726)" />
       <path
          d="m 96.473094,173.19242 v 4.5961 h 6.900846 v 2.96134 h -6.900846 v 8.9778 H 92.98917 v -19.63057 h 12.93072 v 3.09533 z"
          id="path48050"
          clip-path="url(#clipPath48539)"
          style="fill:#8f4e8b;fill-opacity:1"
-         transform="translate(-51.961133,20.642521)" />
+         transform="translate(-51.10365,32.50726)" />
       <path
          d="m 117.16224,181.67444 v 8.05322 h -3.48392 v -8.05322 l -6.61946,-11.57735 h 3.69832 l 4.6497,8.37482 4.6631,-8.37482 h 3.68492 z"
          id="path48052"
          clip-path="url(#clipPath48535)"
          style="fill:#8f4e8b;fill-opacity:1"
-         transform="translate(-51.961133,20.642521)" />
+         transform="translate(-51.10365,32.50726)" />
     </g>
     <text
        xml:space="preserve"
-       transform="scale(0.26458333)"
+       transform="matrix(0.26458333,0,0,0.26458333,0.85748335,11.864739)"
        id="text40672"
        style="font-size:80px;line-height:1.25;font-family:Quicksand;-inkscape-font-specification:Quicksand;white-space:pre;shape-inside:url(#rect40674)" />
   </g>
