@@ -1,4 +1,4 @@
-module Colors exposing (..)
+module Style exposing (..)
 
 import Colors.Opaque as C exposing (..)
 import Element.Background as Background
@@ -33,10 +33,14 @@ button attrs = I.button ([ Background.color mediumPurple
                          ] ++ attrs)
 
 text : List (Attribute msg) -> List (Element msg) -> Element msg
-text attrs = row ([ Font.color darkPurple
-                  , Background.color white
-                  , paddingXY 20 20
-                  , width fill
-                  , Border.rounded 10
-                  , Border.shadow { blur = 10, color = darkGrey, offset = (5,5), size = -2 }
-                  ] ++ attrs)
+text attrs = row (textStyle ++ attrs)
+
+textStyle : List (Attribute msg)
+textStyle = [ Font.color darkPurple
+            , Font.alignLeft
+            , Background.color white
+            , paddingXY 20 20
+            , width fill
+            , Border.rounded 10
+            , Border.shadow { blur = 10, color = darkGrey, offset = (5,5), size = -2 }
+            ]

@@ -1,9 +1,9 @@
-module Main exposing (..)
+port module Main exposing (..)
 
 import Pages.Query    as Q
 import Pages.Tutorial as T
 
-import Colors as C
+import Style as S
 
 import Browser
 import Browser.Navigation as Nav
@@ -27,6 +27,9 @@ type alias Model =
 type Page 
     = QueryPage Q.Model
     | TutorialPage T.Model
+
+
+port copy : String -> Cmd msg
 
 
 init : Url.Url -> Nav.Key -> ( Model, Cmd Msg )
@@ -63,6 +66,7 @@ update msg model =
             let ( newQmodel, cmdMsg ) = Q.update qmsg qmodel
                 cmd = case cmdMsg of
                     Q.Goto q -> Nav.pushUrl model.key <| tutorialLink q
+                    Q.Copy id -> copy id
                     Q.Nop -> Cmd.none 
             in ( { model | page = QueryPage newQmodel }, cmd )
         ( TutorialMsg tmsg, TutorialPage tmodel ) -> 
@@ -88,7 +92,7 @@ view model =
         { title = title
         , body = [ layout [ width fill
                           , centerX 
-                          , Background.color C.lightGrey
+                          , Background.color S.lightGrey
                           ] 
                      <| column 
                         [ centerX 
@@ -111,9 +115,9 @@ topBar =
     el [ width fill 
        , height (px 60)
        , Border.widthEach { bottom = 1, top = 0, left = 0, right = 0 }
-       , Border.color C.black
-       , Background.color C.white
-       , Border.shadow { blur = 10, color = C.darkGrey, offset = (0, 0), size = 2 }
+       , Border.color S.black
+       , Background.color S.white
+       , Border.shadow { blur = 10, color = S.darkGrey, offset = (0, 0), size = 2 }
        ]
      <| row [ width (fill |> maximum (800))
             , paddingXY 10 10
@@ -131,33 +135,32 @@ bottomBar =
     el [ width fill 
        , height (px 60)
        , Border.widthEach { bottom = 0, top = 1, left = 0, right = 0 }
-       , Border.color C.black
-       , Background.color C.white
-       , Border.shadow { blur = 10, color = C.darkGrey, offset = (0, 0), size = 2 }
+       , Border.color S.black
+       , Background.color S.white
+       , Border.shadow { blur = 10, color = S.darkGrey, offset = (0, 0), size = 2 }
        ]
      <| row [ width (fill |> maximum (800))
             , height fill
             , paddingXY 10 10
             , centerX
+            , centerY
+            , Font.size 12 
             ]
-            [ el [ alignRight
-                 , centerY
-                 , Font.size 12 
-                 ] 
-                <| row []
-                    [ text "© "
-                    , link [ Font.color C.mediumPurple ] 
-                        { url = "https://github.com/jimbxb"
-                        , label = text "James Barnes"
-                        }
-                    , text ", 2021. "
-                    , text "LMHTFY is not endorsed by, sponsored by, or affiliated with "
-                    , link [ Font.color C.mediumPurple ]
-                        { url = "https://www.haskell.org/"
-                        , label = text "Haskell.org"
-                        }
-                    , text "."
-                    ]
+            [ row [ centerX
+                  ]
+                [ text "© "
+                , link [ Font.color S.mediumPurple ] 
+                    { url = "https://github.com/jimbxb"
+                    , label = text "James Barnes"
+                    }
+                , text ", 2021. "
+                , text "LMHTFY is not endorsed by, sponsored by, or affiliated with "
+                , link [ Font.color S.mediumPurple ]
+                    { url = "https://www.haskell.org/"
+                    , label = text "Haskell.org"
+                    }
+                , text "."
+                ]
             ]
 
 title : String 

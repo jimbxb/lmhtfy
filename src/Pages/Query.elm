@@ -1,7 +1,7 @@
 
 module Pages.Query exposing (Model, Msg(..), OutMsg(..), init, update, view)
 
-import Colors as C
+import Style as S
 
 import Url
 import Url.Builder as UB
@@ -11,7 +11,7 @@ import Element.Border as Border
 import Element.Events exposing (onClick, onMouseEnter, onMouseLeave)
 import Element.Font as Font
 import Element.Input as I
-import Html.Attributes as HA exposing (style)
+import Html.Attributes as HA exposing (style, id)
 
 import Maybe.Extra exposing (toList)
 
@@ -26,11 +26,13 @@ type Msg
     = QueryChanged String
     | ClearLink
     | GenerateLink
+    | CopyLink String
     | TryItOut 
 
 
 type OutMsg 
     = Goto String
+    | Copy String
     | Nop
 
 
@@ -48,50 +50,57 @@ update msg model =
         QueryChanged q -> ( { model | query = q }, Nop )
         ClearLink -> ( { model | link = Nothing }, Nop )
         GenerateLink -> ( { model | link = Just <| model.query }, Nop )
+        CopyLink id -> ( model, Copy id )
         TryItOut -> ( model, Goto model.query )
 
 
 view : Model -> Element Msg
 view model = 
     let emptyQuery = model.query == ""
-    in column [ width fill
-              , spacingXY 0 20 
-              , paddingXY 10 0
-              ] 
-     <| [ I.search [ width fill
-                   , Font.alignLeft
-                   , spacingXY 20 0 
-                   , Border.rounded 10
-                   , paddingXY 20 20
-                   , Font.color C.darkPurple
-                   ] 
-            { onChange = QueryChanged
-            , text = model.query
-            , placeholder = Nothing
-            , label = I.labelHidden "Query" 
-            }
-        , row [ spacingXY 20 0
-              , width fill
-              , alignRight 
-              ] 
-            [ C.button [ alignRight ] 
-                { onPress = Just <| if emptyQuery then ClearLink else GenerateLink
-                , label = text "Generate Link"
+    in column [ spacingXY 0 20
+           , width fill
+           ] 
+     <| [el [ spacingXY 0 10
+                , paddingXY 10 0
+                , width fill
+                ]
+         <| I.search S.textStyle
+                { onChange = QueryChanged
+                , text = model.query
+                , placeholder = Just <| I.placeholder [] 
+                                     <| text "Enter a query..."
+                , label = I.labelHidden "Query" 
                 }
-            , C.button [ alignRight ] 
-                { onPress = if emptyQuery then Nothing else Just TryItOut
-                , label = text "Try It Out"
-                }
+        , wrappedRow [ width fill
+                     , spacingXY 20 20
+                     , paddingXY 20 0 
+                     , alignRight
+                     ]  
+         <| List.map (S.button [ alignRight ])
+         <| Maybe.Extra.toList (Maybe.map (
+                always 
+                 <| { onPress = Just (CopyLink "link")
+                    , label = text "Copy Link"
+                    }
+            ) model.link)
+             ++ 
+            [ { onPress = Just <| if emptyQuery then ClearLink else GenerateLink
+              , label = text "Generate Link"
+              }
+            , { onPress = if emptyQuery then Nothing else Just TryItOut
+              , label = text "Try It Out"
+              }
             ]
         ] ++ Maybe.Extra.toList (Maybe.map (\l -> 
             let params = [ UB.string "q" l ]
-            in C.text [ width fill
-                      , clip
+                href = model.url ++ UB.relative [] params
+            in S.text [ clip
                       , htmlAttribute <| HA.style "flex-basis" "auto"
                       ]
-                    [ link [ alignLeft ] 
+                    [ link [ alignLeft, htmlAttribute <| id "link" ] 
                         { url = UB.absolute [] params
                         , label = text <| model.url ++ UB.relative [] params
                         }
                     ]
+
         ) model.link)
