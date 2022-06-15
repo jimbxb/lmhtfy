@@ -9,7 +9,7 @@ import Browser
 import Browser.Navigation as Nav
 import Url
 import Url.Builder as UB
-import Url.Parser as UParser exposing (parse)
+import Url.Parser as UParser exposing (parse, string, (</>))
 import Url.Parser.Query as UQParser exposing (string)
 import Element exposing (..)
 import Element.Background as Background
@@ -29,6 +29,8 @@ type Page
     | TutorialPage T.Model
 
 
+
+
 port copy : String -> Cmd msg
 
 
@@ -38,13 +40,13 @@ init url key =
                 , key = key
                 }
     in case parseUrl url of
-        Nothing -> ( model, Nav.pushUrl model.key "/" )
+        Nothing -> ( model, Nav.pushUrl model.key "lmhtfy" )
         Just Nothing -> ( model, Cmd.none )
         Just (Just q) -> ( { model | page = TutorialPage <| T.init q }, Cmd.none )
 
 
 parseUrl : Url.Url -> Maybe (Maybe String)
-parseUrl url = parse (UParser.query <| UQParser.string "q") url
+parseUrl url = parse (UParser.s "lmhtfy" </> UParser.query (UQParser.string "q")) url
 
 
 type Msg
@@ -80,7 +82,7 @@ update msg model =
 
 
 tutorialLink : String -> String
-tutorialLink query = UB.absolute [] [ UB.string "q" query ]
+tutorialLink query = UB.absolute ["lmhtfy"] [ UB.string "q" query ]
 
 
 view : Model -> Browser.Document Msg
@@ -126,7 +128,7 @@ topBar =
             , centerY
             ]
             [ image []
-                { src = "images/lmhtfy.svg"
+                { src = "public/images/lmhtfy.svg"
                 , description = "LMHTFY Logo"
                 } 
             ]
