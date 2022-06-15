@@ -6066,9 +6066,11 @@ var $elm$url$Url$Builder$toQuery = function (parameters) {
 			A2($elm$core$List$map, $elm$url$Url$Builder$toQueryPair, parameters));
 	}
 };
-var $elm$url$Url$Builder$absolute = F2(
+var $elm$url$Url$Builder$relative = F2(
 	function (pathSegments, parameters) {
-		return '/' + (A2($elm$core$String$join, '/', pathSegments) + $elm$url$Url$Builder$toQuery(parameters));
+		return _Utils_ap(
+			A2($elm$core$String$join, '/', pathSegments),
+			$elm$url$Url$Builder$toQuery(parameters));
 	});
 var $elm$url$Url$Builder$QueryParameter = F2(
 	function (a, b) {
@@ -6084,7 +6086,7 @@ var $elm$url$Url$Builder$string = F2(
 	});
 var $author$project$Main$tutorialLink = function (query) {
 	return A2(
-		$elm$url$Url$Builder$absolute,
+		$elm$url$Url$Builder$relative,
 		_List_fromArray(
 			['lmhtfy']),
 		_List_fromArray(
@@ -12998,6 +13000,10 @@ var $author$project$Pages$Query$QueryChanged = function (a) {
 	return {$: 0, a: a};
 };
 var $author$project$Pages$Query$TryItOut = {$: 4};
+var $elm$url$Url$Builder$absolute = F2(
+	function (pathSegments, parameters) {
+		return '/' + (A2($elm$core$String$join, '/', pathSegments) + $elm$url$Url$Builder$toQuery(parameters));
+	});
 var $mdgriffith$elm_ui$Internal$Model$Left = 0;
 var $mdgriffith$elm_ui$Element$alignLeft = $mdgriffith$elm_ui$Internal$Model$AlignX(0);
 var $mdgriffith$elm_ui$Internal$Model$Right = 2;
@@ -13196,12 +13202,6 @@ var $mdgriffith$elm_ui$Element$Input$Placeholder = F2(
 		return {$: 0, a: a, b: b};
 	});
 var $mdgriffith$elm_ui$Element$Input$placeholder = $mdgriffith$elm_ui$Element$Input$Placeholder;
-var $elm$url$Url$Builder$relative = F2(
-	function (pathSegments, parameters) {
-		return _Utils_ap(
-			A2($elm$core$String$join, '/', pathSegments),
-			$elm$url$Url$Builder$toQuery(parameters));
-	});
 var $mdgriffith$elm_ui$Element$Input$TextInputNode = function (a) {
 	return {$: 0, a: a};
 };

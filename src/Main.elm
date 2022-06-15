@@ -82,7 +82,7 @@ update msg model =
 
 
 tutorialLink : String -> String
-tutorialLink query = UB.absolute ["lmhtfy"] [ UB.string "q" query ]
+tutorialLink query = UB.relative ["lmhtfy"] [ UB.string "q" query ]
 
 
 view : Model -> Browser.Document Msg
