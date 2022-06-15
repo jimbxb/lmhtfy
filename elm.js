@@ -14331,6 +14331,7 @@ var $author$project$Pages$Query$view = function (model) {
 		_List_fromArray(
 			[
 				A2($mdgriffith$elm_ui$Element$spacingXY, 0, 20),
+				A2($mdgriffith$elm_ui$Element$paddingXY, 10, 0),
 				$mdgriffith$elm_ui$Element$width($mdgriffith$elm_ui$Element$fill)
 			]),
 		_Utils_ap(
@@ -14341,7 +14342,6 @@ var $author$project$Pages$Query$view = function (model) {
 					_List_fromArray(
 						[
 							A2($mdgriffith$elm_ui$Element$spacingXY, 0, 10),
-							A2($mdgriffith$elm_ui$Element$paddingXY, 10, 0),
 							$mdgriffith$elm_ui$Element$width($mdgriffith$elm_ui$Element$fill)
 						]),
 					A2(
@@ -14363,7 +14363,7 @@ var $author$project$Pages$Query$view = function (model) {
 						[
 							$mdgriffith$elm_ui$Element$width($mdgriffith$elm_ui$Element$fill),
 							A2($mdgriffith$elm_ui$Element$spacingXY, 20, 20),
-							A2($mdgriffith$elm_ui$Element$paddingXY, 20, 0),
+							A2($mdgriffith$elm_ui$Element$paddingXY, 10, 0),
 							$mdgriffith$elm_ui$Element$alignRight
 						]),
 					A2(

@@ -58,12 +58,12 @@ view : Model -> Element Msg
 view model = 
     let emptyQuery = model.query == ""
     in column [ spacingXY 0 20
-           , width fill
-           ] 
+              , paddingXY 10 0
+              , width fill
+              ] 
      <| [el [ spacingXY 0 10
-                , paddingXY 10 0
-                , width fill
-                ]
+            , width fill
+            ]
          <| I.search S.textStyle
                 { onChange = QueryChanged
                 , text = model.query
@@ -73,7 +73,7 @@ view model =
                 }
         , wrappedRow [ width fill
                      , spacingXY 20 20
-                     , paddingXY 20 0 
+                     , paddingXY 10 0 
                      , alignRight
                      ]  
          <| List.map (S.button [ alignRight ])

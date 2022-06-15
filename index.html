@@ -5,10 +5,9 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>LMHTFY</title>
+    <title>Let Me Hoogle That For You</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/7.0.0/normalize.min.css">
-    <link rel="manifest" href="public/manifest.json">
-    <link rel="manifest" href="public/favicon.ico">
+    <link rel="shortcut icon" type="image/png" href="assets/favicon.ico">
 </head>
 
 <body>
@@ -20,30 +19,33 @@
         });
         app.ports.copy && app.ports.copy.subscribe((id) => {
             // https://stackoverflow.com/questions/36639681/how-to-copy-text-from-a-div-to-clipboard
-            if (window.getSelection) {
-                if (window.getSelection().empty) { // Chrome
-                    window.getSelection().empty();
-                } else if (window.getSelection().removeAllRanges) { // Firefox
-                    window.getSelection().removeAllRanges();
+            const elt = document.getElementById(id);
+            if (elt) {
+                if (window.getSelection) {
+                    if (window.getSelection().empty) { // Chrome
+                        window.getSelection().empty();
+                    } else if (window.getSelection().removeAllRanges) { // Firefox
+                        window.getSelection().removeAllRanges();
+                    }
+                } else if (document.selection) { // IE?
+                    document.selection.empty();
                 }
-            } else if (document.selection) { // IE?
-                document.selection.empty();
-            }
 
-            if (document.selection) {
-                var range = document.body.createTextRange();
-                range.moveToElementText(document.getElementById(id));
-                range.select().createTextRange();
-                document.execCommand("copy");
-            } else if (window.getSelection) {
-                var range = document.createRange();
-                range.selectNode(document.getElementById(id));
-                window.getSelection().addRange(range);
-                document.execCommand("copy");
-                if (window.getSelection().empty) { // Chrome
-                    window.getSelection().empty();
-                } else if (window.getSelection().removeAllRanges) { // Firefox
-                    window.getSelection().removeAllRanges();
+                if (document.selection) {
+                    var range = document.body.createTextRange();
+                    range.moveToElementText(elt);
+                    range.select().createTextRange();
+                    document.execCommand("copy");
+                } else if (window.getSelection) {
+                    var range = document.createRange();
+                    range.selectNode(elt);
+                    window.getSelection().addRange(range);
+                    document.execCommand("copy");
+                    if (window.getSelection().empty) { // Chrome
+                        window.getSelection().empty();
+                    } else if (window.getSelection().removeAllRanges) { // Firefox
+                        window.getSelection().removeAllRanges();
+                    }
                 }
             }
         });
