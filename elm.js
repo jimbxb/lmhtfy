@@ -12992,7 +12992,7 @@ var $author$project$Main$topBar = A2(
 						$mdgriffith$elm_ui$Element$height(
 						$mdgriffith$elm_ui$Element$px(40))
 					]),
-				{cu: 'LMHTFY Logo', di: 'public/images/lmhtfy.svg'})
+				{cu: 'LMHTFY Logo', di: 'assets/lmhtfy.svg'})
 			])));
 var $author$project$Pages$Query$ClearLink = {$: 1};
 var $author$project$Pages$Query$CopyLink = function (a) {

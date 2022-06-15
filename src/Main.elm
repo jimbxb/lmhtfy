@@ -128,7 +128,7 @@ topBar =
             , centerY
             ]
             [ image [ height (px 40) ]
-                { src = "public/images/lmhtfy.svg"
+                { src = "assets/lmhtfy.svg"
                 , description = "LMHTFY Logo"
                 } 
             ]
