@@ -12989,7 +12989,8 @@ var $author$project$Main$topBar = A2(
 				$mdgriffith$elm_ui$Element$image,
 				_List_fromArray(
 					[
-						$mdgriffith$elm_ui$Element$height($mdgriffith$elm_ui$Element$fill)
+						$mdgriffith$elm_ui$Element$height(
+						$mdgriffith$elm_ui$Element$px(40))
 					]),
 				{cu: 'LMHTFY Logo', di: 'public/images/lmhtfy.svg'})
 			])));

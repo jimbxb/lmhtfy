@@ -127,7 +127,7 @@ topBar =
             , centerX
             , centerY
             ]
-            [ image [ height fill ]
+            [ image [ height (px 40) ]
                 { src = "public/images/lmhtfy.svg"
                 , description = "LMHTFY Logo"
                 } 
