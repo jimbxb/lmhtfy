@@ -5,7 +5,7 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Rhythm Press - A poetic exhibition of rhythm adn rhyme</title>
+    <title>LMHTFY</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/7.0.0/normalize.min.css">
 </head>
 
@@ -15,7 +15,36 @@
     <script>
         const elmDiv = document.querySelector('#elm-app');
         if (elmDiv) {
-            var myApp = Elm.Main.embed(elmDiv);
+            const app = Elm.Main.embed(elmDiv);
+            app.ports.copy && app.ports.copy.subscribe((id) => {
+                // https://stackoverflow.com/questions/36639681/how-to-copy-text-from-a-div-to-clipboard
+                if (window.getSelection) {
+                    if (window.getSelection().empty) { // Chrome
+                        window.getSelection().empty();
+                    } else if (window.getSelection().removeAllRanges) { // Firefox
+                        window.getSelection().removeAllRanges();
+                    }
+                } else if (document.selection) { // IE?
+                    document.selection.empty();
+                }
+
+                if (document.selection) {
+                    var range = document.body.createTextRange();
+                    range.moveToElementText(document.getElementById(id));
+                    range.select().createTextRange();
+                    document.execCommand("copy");
+                } else if (window.getSelection) {
+                    var range = document.createRange();
+                    range.selectNode(document.getElementById(id));
+                    window.getSelection().addRange(range);
+                    document.execCommand("copy");
+                    if (window.getSelection().empty) { // Chrome
+                        window.getSelection().empty();
+                    } else if (window.getSelection().removeAllRanges) { // Firefox
+                        window.getSelection().removeAllRanges();
+                    }
+                }
+            });
         }
     </script>
 </body>
