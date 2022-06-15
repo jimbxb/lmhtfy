@@ -7,18 +7,29 @@ import Element exposing (..)
 import Element.Background as Background
 import Element.Border as Border
 import Element.Font as Font
-import Element.Input as Input
+import Element.Input as I
 import Html.Attributes as HA exposing (style)
 
 
 type alias Model = 
-    { query : String }
+    { query : String
+    , stage : Stage
+    , searchTerm : String
+    }
+
+
+type Stage
+    = VisitHoogle
+    | TypeQuery
+    | HoogleIt
 
 
 type Msg
-    = Query
+    = LMHTFYQuery
     | HoogleHome
-    | HoogleIt
+    | HoogleQuery
+    | NextStage
+    | SearchChanged String
 
 
 type OutMsg 
@@ -28,54 +39,99 @@ type OutMsg
 
 
 init : String -> Model
-init q = { query = q }
+init q = { query = q, stage = VisitHoogle, searchTerm = "" }
 
 
 update : Msg -> Model -> ( Model, OutMsg )
 update msg model = 
     case msg of
-        Query -> ( model, Goto "/" )
+        LMHTFYQuery -> ( model, Goto "/" )
         HoogleHome -> ( model, ExternalGoto hoogleHome )
-        HoogleIt -> ( model, ExternalGoto <| hoogleQuery model.query )
+        HoogleQuery -> ( model, ExternalGoto <| hoogleQuery model.query )
+        SearchChanged s -> ( { model | searchTerm = s }, Nop )
+        NextStage -> 
+            ( { model 
+              | stage = case model.stage of
+                    VisitHoogle -> TypeQuery
+                    TypeQuery -> HoogleIt
+                    HoogleIt -> VisitHoogle 
+              }
+            , Nop 
+            )
         
 
 view : Model -> Element Msg
 view model = 
-    column [ spacingXY 0 20
-           , width fill
-           ] 
-     <| [column [ spacingXY 0 10
+    let correctSearch = model.searchTerm == model.query
+    in column [ spacingXY 0 20
+              , width fill
+              , height fill
+              ] 
+     <| [column [ spacingXY 0 20
                 , paddingXY 10 0
                 , width fill
                 ]
-         <| List.indexedMap 
-                (\i x -> S.text [ clip
-                                , htmlAttribute <| HA.style "flex-basis" "auto" 
-                                ] [text <| String.fromInt (i + 1) ++ ". ", x])
-            [ row [] 
-                [ text "Visit "
-                , link [ Font.color S.mediumPurple ] 
-                    { url = hoogleHome
-                    , label = text <| hoogleDomain
-                    }
-                ]
-            , text <| "Search for: " ++ model.query
-            , text "Click 'Search'"
-            ]
+         <| case model.stage of
+                VisitHoogle -> 
+                    [ S.text [] 
+                        [ text "1. Visit "
+                        , link [ Font.color S.mediumPurple ] 
+                            { url = hoogleHome
+                            , label = text <| hoogleDomain
+                            }
+                        ]
+                    , el [ paddingXY 10 0, alignRight ]
+                      <| S.button True [ alignRight ]
+                            { onPress = Just NextStage
+                            , label = text "Next"
+                            }
+                    ]
+                TypeQuery -> 
+                    [ S.text [ clip
+                             , htmlAttribute <| HA.style "flex-basis" "auto" 
+                             ] 
+                        [ text <| "2. Search for " ++ model.query ]
+                    , I.search S.textStyle
+                        { onChange = SearchChanged
+                        , text = model.searchTerm
+                        , placeholder = Just <| I.placeholder [] 
+                                             <| text "Enter a query..."
+                        , label = I.labelHidden "Query" 
+                        }
+                    , el [ paddingXY 10 0, alignRight ]
+                     <| S.button correctSearch [ alignRight ]
+                            { onPress = 
+                                if correctSearch
+                                then Just NextStage else Nothing
+                            , label = text "Search"
+                            }
+                    ]
+                HoogleIt -> 
+                    [ S.text [] [ text "3. That's it. You're done." ]
+                    , wrappedRow [ spacingXY 10 10
+                                 , paddingXY 10 0
+                                 , alignRight
+                                 ] 
+                        [ S.button True []
+                            { onPress = Just HoogleQuery
+                            , label = text "Hoogle It"
+                            }
+                        , S.button True []
+                            { onPress = Just NextStage
+                            , label = text "Restart"
+                            }
+                        ]
+                    ]
         ] ++ 
-        [ wrappedRow [ width fill
-                     , spacingXY 20 20
-                     , paddingXY 20 0 
-                     , alignRight
-                     ] 
-         <| List.map (S.button [ alignRight ]) 
-                [ { onPress = Just HoogleIt
-                  , label = text "Hoogle It"
-                  }
-                , { onPress = Just Query
-                  , label = text "Try Another"
-                  }
-                ]
+        [ el [ width fill
+             , spacingXY 20 20
+             , paddingXY 20 0 
+             , alignBottom
+             ] 
+         <| S.button True [ alignRight ]
+                { onPress = Just LMHTFYQuery
+                , label = text "Try Another"
+                }
         ]
 
 

@@ -148,8 +148,7 @@ bottomBar =
             , centerY
             , Font.size 12 
             ]
-            [ row [ centerX
-                  ]
+            [ wrappedRow [ centerX ]
                 [ text "© "
                 , link [ Font.color S.mediumPurple ] 
                     { url = "https://github.com/jimbxb"
@@ -160,6 +159,11 @@ bottomBar =
                 , link [ Font.color S.mediumPurple ]
                     { url = "https://www.haskell.org/"
                     , label = text "Haskell.org"
+                    }
+                , text " nor "
+                , link [ Font.color S.mediumPurple ]
+                    { url = "https://hoogle.haskell.org/"
+                    , label = text "Hoogle"
                     }
                 , text "."
                 ]

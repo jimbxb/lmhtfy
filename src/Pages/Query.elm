@@ -57,11 +57,31 @@ update msg model =
 view : Model -> Element Msg
 view model = 
     let emptyQuery = model.query == ""
+        ( copyButton, linkText ) 
+            = case model.link of
+                Nothing -> ( [], [] )
+                Just l -> 
+                    let params = [ UB.string "q" l ]
+                        href = model.url ++ UB.relative [] params
+                    in 
+                    ( [S.button True [ alignRight ]
+                        { onPress = Just (CopyLink "link")
+                        , label = text "Copy Link"
+                        }]
+                    , [S.text [ clip
+                              , htmlAttribute <| HA.style "flex-basis" "auto"
+                              ]
+                        [ link [ alignLeft, htmlAttribute <| id "link" ] 
+                            { url = UB.relative [] params
+                            , label = text <| model.url ++ UB.relative [] params
+                            }
+                        ]]
+                    )
     in column [ spacingXY 0 20
               , paddingXY 10 0
               , width fill
               ] 
-     <| [el [ spacingXY 0 10
+     <| [el [ spacingXY 0 20
             , width fill
             ]
          <| I.search S.textStyle
@@ -76,31 +96,13 @@ view model =
                      , paddingXY 10 0 
                      , alignRight
                      ]  
-         <| List.map (S.button [ alignRight ])
-         <| Maybe.Extra.toList (Maybe.map (
-                always 
-                 <| { onPress = Just (CopyLink "link")
-                    , label = text "Copy Link"
-                    }
-            ) model.link)
-             ++ 
-            [ { onPress = Just <| if emptyQuery then ClearLink else GenerateLink
-              , label = text "Generate Link"
-              }
-            , { onPress = if emptyQuery then Nothing else Just TryItOut
-              , label = text "Try It Out"
-              }
-            ]
-        ] ++ Maybe.Extra.toList (Maybe.map (\q -> 
-            let params = [ UB.string "q" q ]
-                href = model.url ++ UB.relative [] params
-            in S.text [ clip
-                      , htmlAttribute <| HA.style "flex-basis" "auto"
-                      ]
-                    [ link [ alignLeft, htmlAttribute <| id "link" ] 
-                        { url = UB.relative [] params
-                        , label = text <| model.url ++ UB.relative [] params
-                        }
-                    ]
-
-        ) model.link)
+         <| copyButton ++ 
+            List.map (S.button (not emptyQuery) [ alignRight ])
+                [ { onPress = Just <| if emptyQuery then ClearLink else GenerateLink
+                  , label = text "Generate Link"
+                  }
+                , { onPress = if emptyQuery then Nothing else Just TryItOut
+                  , label = text "Try It Out"
+                  }
+                ]
+        ] ++ linkText

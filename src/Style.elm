@@ -23,14 +23,15 @@ black        = C.black
 white        = C.white
 
 
-button : List (Attribute msg) -> { label : Element msg, onPress : Maybe msg } -> Element msg
-button attrs = I.button ([ Background.color mediumPurple
-                         , Font.color white
-                         , paddingXY 15 15
-                         , Border.rounded 10
-                         , Border.color darkPurple
-                         , Border.width 3
-                         ] ++ attrs)
+button : Bool -> List (Attribute msg) -> { label : Element msg, onPress : Maybe msg } -> Element msg
+button enabled attrs 
+    = I.button ([ Background.color <| if enabled then mediumPurple else darkGrey
+                , Font.color white
+                , paddingXY 15 15
+                , Border.rounded 10
+                , Border.color <| if enabled then darkPurple else black
+                , Border.width 3
+                ] ++ attrs)
 
 text : List (Attribute msg) -> List (Element msg) -> Element msg
 text attrs = row (textStyle ++ attrs)
