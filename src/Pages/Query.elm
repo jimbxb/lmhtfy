@@ -1,6 +1,8 @@
 
 module Pages.Query exposing (Model, Msg(..), OutMsg(..), init, update, view)
 
+import Colors as C
+
 import Url
 import Url.Builder as UB
 import Element exposing (..)
@@ -10,7 +12,6 @@ import Element.Events exposing (onClick, onMouseEnter, onMouseLeave)
 import Element.Font as Font
 import Element.Input as I
 import Html.Attributes as HA exposing (style)
-import Html as H exposing (Html, a, div)
 
 import Maybe.Extra exposing (toList)
 
@@ -55,39 +56,42 @@ view model =
     let emptyQuery = model.query == ""
     in column [ width fill
               , spacingXY 0 20 
+              , paddingXY 10 0
               ] 
      <| [ I.search [ width fill
                    , Font.alignLeft
                    , spacingXY 20 0 
-                   , centerY
+                   , Border.rounded 10
+                   , paddingXY 20 20
+                   , Font.color C.darkPurple
                    ] 
             { onChange = QueryChanged
             , text = model.query
             , placeholder = Nothing
             , label = I.labelHidden "Query" 
             }
-        , row [ paddingXY 10 0
-              , spacingXY 20 0
+        , row [ spacingXY 20 0
               , width fill
               , alignRight 
               ] 
-            [ I.button [ alignRight ]
+            [ C.button [ alignRight ] 
                 { onPress = Just <| if emptyQuery then ClearLink else GenerateLink
                 , label = text "Generate Link"
                 }
-            , I.button []
+            , C.button [ alignRight ] 
                 { onPress = if emptyQuery then Nothing else Just TryItOut
                 , label = text "Try It Out"
                 }
             ]
         ] ++ Maybe.Extra.toList (Maybe.map (\l -> 
             let params = [ UB.string "q" l ]
-            in el [ width fill
-                  , clip
-                  , htmlAttribute <| HA.style "flex-basis" "auto" 
-                  ]
-                <| link [ alignLeft ] 
-                    { url = UB.absolute [] params
-                    , label = text <| model.url ++ UB.relative [] params
-                    }
+            in C.text [ width fill
+                      , clip
+                      , htmlAttribute <| HA.style "flex-basis" "auto"
+                      ]
+                    [ link [ alignLeft ] 
+                        { url = UB.absolute [] params
+                        , label = text <| model.url ++ UB.relative [] params
+                        }
+                    ]
         ) model.link)

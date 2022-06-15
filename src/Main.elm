@@ -3,6 +3,8 @@ module Main exposing (..)
 import Pages.Query    as Q
 import Pages.Tutorial as T
 
+import Colors as C
+
 import Browser
 import Browser.Navigation as Nav
 import Url
@@ -83,32 +85,40 @@ view model =
             TutorialPage m -> T.view m |> Element.map TutorialMsg
     in 
         { title = title
-        , body = [ 
-            layout [ width fill
-                   , centerX 
-                   ] 
-                <| column 
-                    [ spacingXY 0 20
-                    , paddingXY 20 20
-                    , centerX 
-                    , width (fill |> maximum (800))
-                    ]
-                    [ navBar
-                    , el [ paddingXY 10 10, width fill] content
-                    ]
-            ]
+        , body = [ layout [ width fill
+                          , centerX 
+                          , Background.color C.lightGrey
+                          ] 
+                     <| column 
+                        [ centerX 
+                        , width fill
+                        ]
+                        [ navBar
+                        , el [ paddingXY 10 20
+                             , width (fill |> maximum (800))
+                             , centerX
+                             ] content
+                        ]
+                 ]
         }
 
 
 navBar = 
-    row [ width fill
-        , paddingXY 10 10
-        , Border.widthEach { bottom = 1, top = 0, left = 0, right = 0 }
-        , Border.color blue
-        , centerX
-        ]
-        [ el [ alignLeft ] <| text title
-        ]
+    el [ width fill 
+       , Border.widthEach { bottom = 1, top = 0, left = 0, right = 0 }
+       , Border.color C.black
+       , Background.color C.white
+       , Border.shadow { blur = 10, color = C.darkGrey, offset = (0, 0), size = 2 }
+       ]
+     <| row [ width (fill |> maximum (800))
+            , paddingXY 10 10
+            , centerX
+            ]
+            [ image []
+                { src = "images/lmhtfy.svg"
+                , description = "LMHTFY Logo"
+                } 
+            ]
 
 
 title : String 

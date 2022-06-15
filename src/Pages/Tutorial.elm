@@ -1,11 +1,14 @@
 module Pages.Tutorial exposing (Model, Msg(..), OutMsg(..), init, update, view)
 
+import Colors as C
+
 import Url.Builder as UB
 import Element exposing (..)
 import Element.Background as Background
 import Element.Border as Border
 import Element.Font as Font
 import Element.Input as Input
+import Html.Attributes as HA exposing (style)
 
 
 type alias Model = 
@@ -39,31 +42,41 @@ update msg model =
 
 view : Model -> Element Msg
 view model = 
-    column [ spacingXY 0 20, width fill, clip ] 
-     <| List.indexedMap (\i x -> row [] [text <| String.fromInt (i + 1) ++ ". ", x])
+    column [ spacingXY 0 20
+           , width fill
+           ] 
+     <| [column [ spacingXY 0 10
+                , paddingXY 10 0
+                , width fill
+                ]
+         <| List.indexedMap 
+                (\i x -> C.text [ clip, htmlAttribute <| HA.style "flex-basis" "auto" ] [text <| String.fromInt (i + 1) ++ ". ", x])
             [ row [] 
                 [ text "Visit "
-                , link [] { url = hoogleHome
-                          , label = text <| hoogleDomain
-                          }
+                , link [ Font.color C.mediumPurple ] 
+                    { url = hoogleHome
+                    , label = text <| hoogleDomain
+                    }
                 ]
-            , text <| "Type in: " ++ model.query
+            , el [] <| text <| "Type in: " ++ model.query
             , text "Click 'Search'"
-            ]
-        ++ [ row [ spacingXY 20 0, width fill ] 
-                [ Input.button [ alignRight ] 
-                    { onPress = Just HoogleHome
-                    , label = text "Try It Out"
-                    }
-                , Input.button []
-                    { onPress = Just HoogleIt
-                    , label = text "Hoogle It"
-                    }
-                , Input.button []
-                    { onPress = Just Query
-                    , label = text "Try Another"
-                    }
-                ]
+            ]]
+        ++ [ wrappedRow [ spacingXY 20 20
+                        , width fill
+                        , paddingXY 20 0 
+                        , alignRight
+                        ] 
+             <| List.map (C.button [ alignRight ]) 
+                    [ { onPress = Just HoogleHome
+                      , label = text "Try It Out"
+                      }
+                    , { onPress = Just HoogleIt
+                      , label = text "Hoogle It"
+                      }
+                    , { onPress = Just Query
+                      , label = text "Try Another"
+                      }
+                    ]
         ]
 
 
@@ -72,7 +85,7 @@ hoogleDomain = "hoogle.haskell.org"
 
 
 hoogle : List UB.QueryParameter -> String
-hoogle qs = UB.crossOrigin ("https://" ++ hoogleDomain) [] qs
+hoogle qs = UB.crossOrigin ("http://" ++ hoogleDomain) [] qs
 
 
 hoogleHome : String
