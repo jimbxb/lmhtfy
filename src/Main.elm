@@ -2,7 +2,6 @@ port module Main exposing (..)
 
 import Browser
 import Browser.Navigation as Nav
-import Colors.Opaque exposing (..)
 import Date exposing (Date)
 import Element exposing (..)
 import Element.Background as Background
