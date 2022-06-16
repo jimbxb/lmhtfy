@@ -73,6 +73,12 @@ button enabled attrs { label, onPress } =
                 , mouseOver
                     [ alpha 1
                     , moveUp 2
+                    , Border.shadow
+                        { blur = 10
+                        , color = darkGrey
+                        , offset = ( 7, 7 )
+                        , size = -2
+                        }
                     ]
                 ]
              <|

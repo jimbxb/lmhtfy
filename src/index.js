@@ -6,9 +6,7 @@ const app = Elm.Main.init({
   node: document.getElementById('root')
 });
 
-app.ports.copy && app.ports.copy.subscribe((id) => {
-  // https://stackoverflow.com/questions/36639681/how-to-copy-text-from-a-div-to-clipboard
-  const elt = document.getElementById(id);
+const clearSelection = () => {
   if (window.getSelection) {
     if (window.getSelection().empty) { // Chrome
       window.getSelection().empty();
@@ -18,23 +16,23 @@ app.ports.copy && app.ports.copy.subscribe((id) => {
   } else if (document.selection) { // IE?
     document.selection.empty();
   }
+}
 
+app.ports.copy && app.ports.copy.subscribe((id) => {
+  const elt = document.getElementById(id);
+
+  clearSelection();
   if (document.selection) {
     var range = document.body.createTextRange();
     range.moveToElementText(elt);
     range.select().createTextRange();
-    document.execCommand("copy");
   } else if (window.getSelection) {
     var range = document.createRange();
     range.selectNode(elt);
     window.getSelection().addRange(range);
-    document.execCommand("copy");
-    if (window.getSelection().empty) { // Chrome
-      window.getSelection().empty();
-    } else if (window.getSelection().removeAllRanges) { // Firefox
-      window.getSelection().removeAllRanges();
-    }
   }
+  document.execCommand("copy");
+  clearSelection();
 });
 
 // If you want your app to work offline and load faster, you can change
