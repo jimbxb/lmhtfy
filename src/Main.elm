@@ -3,6 +3,7 @@ port module Main exposing (..)
 import Browser
 import Browser.Navigation as Nav
 import Colors.Opaque exposing (..)
+import Date exposing (Date)
 import Element exposing (..)
 import Element.Background as Background
 import Element.Border as Border
@@ -11,7 +12,9 @@ import Element.Input as I
 import Pages.Query as Q
 import Pages.Tutorial as T
 import Style as S
-import Url
+import Task
+import Time exposing (Month(..))
+import Url exposing (Url)
 import Url.Builder as UB
 import Url.Parser as UParser exposing ((</>))
 import Url.Parser.Query as UQParser
@@ -20,6 +23,7 @@ import Url.Parser.Query as UQParser
 type alias Model =
     { page : Page
     , key : Nav.Key
+    , date : Date
     }
 
 
@@ -36,12 +40,13 @@ lmhtfy =
     UB.absolute [ "lmhtfy" ] []
 
 
-init : Url.Url -> Nav.Key -> ( Model, Cmd Msg )
+init : Url -> Nav.Key -> ( Model, Cmd Msg )
 init url key =
     let
         model =
             { page = QueryPage <| Q.init (Url.toString url) "" Nothing
             , key = key
+            , date = Date.fromCalendarDate 2021 Mar 9
             }
     in
     case parseUrl url of
@@ -49,21 +54,22 @@ init url key =
             ( model, Nav.pushUrl model.key lmhtfy )
 
         Just Nothing ->
-            ( model, Cmd.none )
+            ( model, now )
 
         Just (Just q) ->
-            ( { model | page = TutorialPage <| T.init q }, Cmd.none )
+            ( { model | page = TutorialPage <| T.init q }, now )
 
 
-parseUrl : Url.Url -> Maybe (Maybe String)
+parseUrl : Url -> Maybe (Maybe String)
 parseUrl url =
     UParser.parse (UParser.s "lmhtfy" </> UParser.query (UQParser.string "q")) url
 
 
 type Msg
-    = UrlChanged Url.Url
+    = UrlChanged Url
     | UrlRequest Browser.UrlRequest
     | GoHome
+    | SetDate Date
     | QueryMsg Q.Msg
     | TutorialMsg T.Msg
 
@@ -71,9 +77,6 @@ type Msg
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case ( msg, model.page ) of
-        ( GoHome, _ ) ->
-            ( model, Nav.pushUrl model.key lmhtfy )
-
         ( UrlChanged url, _ ) ->
             init url model.key
 
@@ -84,6 +87,12 @@ update msg model =
 
                 Browser.External href ->
                     ( model, Nav.load href )
+
+        ( GoHome, _ ) ->
+            ( model, Nav.pushUrl model.key lmhtfy )
+
+        ( SetDate date, _ ) ->
+            ( { model | date = date }, Cmd.none )
 
         ( QueryMsg qmsg, QueryPage qmodel ) ->
             let
@@ -130,6 +139,11 @@ tutorialLink query =
     UB.relative [] [ UB.string "q" query ]
 
 
+now : Cmd Msg
+now =
+    Task.perform SetDate Date.today
+
+
 view : Model -> Browser.Document Msg
 view model =
     let
@@ -155,7 +169,7 @@ view model =
                 , width fill
                 , height fill
                 ]
-                [ topBar
+                [ topBar model
                 , el
                     [ paddingXY 10 20
                     , width (fill |> maximum 800)
@@ -163,13 +177,14 @@ view model =
                     , height fill
                     ]
                     content
-                , bottomBar
+                , bottomBar model
                 ]
         ]
     }
 
 
-topBar =
+topBar : Model -> Element Msg
+topBar _ =
     el
         [ width fill
         , height (px 60)
@@ -197,7 +212,12 @@ topBar =
             ]
 
 
-bottomBar =
+bottomBar : Model -> Element Msg
+bottomBar { date } =
+    let
+        year =
+            Date.year date
+    in
     el
         [ width fill
         , height (px 60)
@@ -215,13 +235,26 @@ bottomBar =
             , centerY
             , Font.size 12
             ]
-            [ wrappedRow [ centerX ]
+            [ paragraph [ centerX ]
                 [ text "© "
                 , S.link
                     { url = "https://github.com/jimbxb"
-                    , label = text "James Barnes"
+                    , label =
+                        text <|
+                            if date == Date.fromCalendarDate year Mar 15 then
+                                "Jarnes Bames"
+
+                            else
+                                "James Barnes"
                     }
-                , text ", 2021. "
+                , text <|
+                    ", 2022"
+                        ++ (if year > 2022 then
+                                "-" ++ String.fromInt year ++ "."
+
+                            else
+                                "."
+                           )
                 , text "LMHTFY is not endorsed by, sponsored by, or affiliated with "
                 , S.link
                     { url = "https://www.haskell.org/"
