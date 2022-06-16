@@ -8,6 +8,7 @@ const app = Elm.Main.init({
 
 app.ports.copy && app.ports.copy.subscribe((id) => {
   // https://stackoverflow.com/questions/36639681/how-to-copy-text-from-a-div-to-clipboard
+  const elt = document.getElementById(id);
   if (window.getSelection) {
     if (window.getSelection().empty) { // Chrome
       window.getSelection().empty();
@@ -20,12 +21,12 @@ app.ports.copy && app.ports.copy.subscribe((id) => {
 
   if (document.selection) {
     var range = document.body.createTextRange();
-    range.moveToElementText(document.getElementById(id));
+    range.moveToElementText(elt);
     range.select().createTextRange();
     document.execCommand("copy");
   } else if (window.getSelection) {
     var range = document.createRange();
-    range.selectNode(document.getElementById(id));
+    range.selectNode(elt);
     window.getSelection().addRange(range);
     document.execCommand("copy");
     if (window.getSelection().empty) { // Chrome

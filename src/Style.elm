@@ -7,6 +7,16 @@ import Element.Border as Border
 import Element.Font as Font
 import Element.HexColor as H
 import Element.Input as I
+import Html.Attributes as HA exposing (style)
+import Simple.Animation as Animation exposing (Animation)
+import Simple.Animation.Animated as Animated
+import Simple.Animation.Property as P
+import Simple.Transition as T
+import Utils exposing (..)
+
+
+
+-- 69  58  98
 
 
 darkPurple =
@@ -14,7 +24,7 @@ darkPurple =
 
 
 
--- 69  58  98
+-- 94  80  134
 
 
 mediumPurple =
@@ -22,7 +32,7 @@ mediumPurple =
 
 
 
--- 94  80  134
+-- 143 78  139
 
 
 lightPurple =
@@ -30,7 +40,7 @@ lightPurple =
 
 
 
--- 143 78  139
+-- 50  50  50
 
 
 darkGrey =
@@ -38,15 +48,11 @@ darkGrey =
 
 
 
--- 50  50  50
+-- 150 150 150
 
 
 lightGrey =
     Maybe.withDefault C.black <| H.hex "bebebe"
-
-
-
--- 150 150 150
 
 
 black =
@@ -58,32 +64,45 @@ white =
 
 
 button : Bool -> List (Attribute msg) -> { label : Element msg, onPress : Maybe msg } -> Element msg
-button enabled attrs =
-    I.button
-        ([ Background.color <|
-            if enabled then
-                mediumPurple
+button enabled attrs { label, onPress } =
+    let
+        sty =
+            (appendIf enabled
+                [ Background.color mediumPurple
+                , Border.color darkPurple
+                , mouseOver
+                    [ alpha 1
+                    , moveUp 2
+                    ]
+                ]
+             <|
+                [ Font.color white
+                , paddingXY 15 15
+                , Border.rounded 10
+                , Border.width 3
+                , alpha 0.9
+                , Background.color darkGrey
+                , Border.color black
+                , Border.shadow
+                    { blur = 10
+                    , color = darkGrey
+                    , offset = ( 5, 5 )
+                    , size = -2
+                    }
+                ]
+            )
+                ++ attrs
+    in
+    if enabled then
+        I.button sty { label = label, onPress = onPress }
 
-            else
-                darkGrey
-         , Font.color white
-         , paddingXY 15 15
-         , Border.rounded 10
-         , Border.color <|
-            if enabled then
-                darkPurple
-
-            else
-                black
-         , Border.width 3
-         ]
-            ++ attrs
-        )
+    else
+        el sty label
 
 
 text : List (Attribute msg) -> List (Element msg) -> Element msg
 text attrs =
-    row (textStyle ++ attrs)
+    row <| textStyle ++ attrs
 
 
 textStyle : List (Attribute msg)
@@ -101,3 +120,18 @@ textStyle =
 link : { url : String, label : Element msg } -> Element msg
 link =
     Element.link [ Font.color mediumPurple ]
+
+
+animated :
+    Animation
+    -> (List (Attribute msg) -> child -> Element msg)
+    -> List (Attribute msg)
+    -> child
+    -> Element msg
+animated =
+    flip <|
+        Animated.ui
+            { behindContent = behindContent
+            , htmlAttribute = htmlAttribute
+            , html = html
+            }

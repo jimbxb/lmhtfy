@@ -1,11 +1,12 @@
 module Pages.Tutorial exposing (Model, Msg(..), OutMsg(..), init, update, view)
 
 import Element exposing (..)
-import Element.Background as Background
-import Element.Border as Border
-import Element.Font as Font
 import Element.Input as I
 import Html.Attributes as HA exposing (style)
+import Simple.Animation as Animation exposing (Animation)
+import Simple.Animation.Animated as Animated
+import Simple.Animation.Property as P
+import Simple.Transition as T
 import Style as S
 import Url.Builder as UB
 
@@ -69,6 +70,7 @@ update msg model =
 
                         HoogleIt ->
                             VisitHoogle
+                , searchTerm = ""
               }
             , Nop
             )
@@ -138,7 +140,7 @@ view model =
                     ]
 
                 HoogleIt ->
-                    [ S.text [] [ text "3. That's it. You're done." ]
+                    [ S.text [] [ text "3. That's it. You're done. Hoogle It." ]
                     , wrappedRow
                         [ spacingXY 10 10
                         , paddingXY 10 0
@@ -166,7 +168,7 @@ hoogleDomain =
 
 hoogle : List UB.QueryParameter -> String
 hoogle qs =
-    UB.crossOrigin ("http://" ++ hoogleDomain) [] qs
+    UB.crossOrigin ("https://" ++ hoogleDomain) [] qs
 
 
 hoogleHome : String

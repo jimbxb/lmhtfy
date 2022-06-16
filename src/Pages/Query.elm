@@ -1,15 +1,9 @@
 module Pages.Query exposing (Model, Msg(..), OutMsg(..), init, update, view)
 
 import Element exposing (..)
-import Element.Background as Background
-import Element.Border as Border
-import Element.Events exposing (onClick, onMouseEnter, onMouseLeave)
-import Element.Font as Font
 import Element.Input as I
-import Html.Attributes as HA exposing (id, style)
-import Maybe.Extra exposing (toList)
+import Html.Attributes as HA
 import Style as S
-import Url
 import Url.Builder as UB
 
 
@@ -77,12 +71,12 @@ view model =
                         params =
                             [ UB.string "q" l ]
 
-                        href =
-                            model.url ++ UB.relative [] params
+                        linkID =
+                            "link"
                     in
                     ( [ S.button True
                             [ alignRight ]
-                            { onPress = Just (CopyLink "link")
+                            { onPress = Just (CopyLink linkID)
                             , label = text "Copy Link"
                             }
                       ]
@@ -90,7 +84,7 @@ view model =
                             [ clip
                             , htmlAttribute <| HA.style "flex-basis" "auto"
                             ]
-                            [ link [ alignLeft, htmlAttribute <| id "link" ]
+                            [ link [ alignLeft, htmlAttribute <| HA.id linkID ]
                                 { url = UB.relative [] params
                                 , label = text <| model.url ++ UB.relative [] params
                                 }

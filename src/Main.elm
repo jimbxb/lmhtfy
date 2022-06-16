@@ -13,8 +13,8 @@ import Pages.Tutorial as T
 import Style as S
 import Url
 import Url.Builder as UB
-import Url.Parser as UParser exposing ((</>), parse, string)
-import Url.Parser.Query as UQParser exposing (string)
+import Url.Parser as UParser exposing ((</>))
+import Url.Parser.Query as UQParser
 
 
 type alias Model =
@@ -57,7 +57,7 @@ init url key =
 
 parseUrl : Url.Url -> Maybe (Maybe String)
 parseUrl url =
-    parse (UParser.s "lmhtfy" </> UParser.query (UQParser.string "q")) url
+    UParser.parse (UParser.s "lmhtfy" </> UParser.query (UQParser.string "q")) url
 
 
 type Msg
@@ -147,6 +147,7 @@ view model =
             [ width fill
             , centerX
             , Background.color S.lightGrey
+            , clip
             ]
           <|
             column
@@ -190,7 +191,7 @@ topBar =
                 , label =
                     image [ height (px 40) ]
                         { src = "assets/lmhtfy.svg"
-                        , description = title ++ " Logo"
+                        , description = "LMHTFY Logo"
                         }
                 }
             ]
@@ -238,7 +239,7 @@ bottomBar =
 
 title : String
 title =
-    "LMHTFY"
+    "LMHTFY | Let Me Hoogle That For You"
 
 
 main : Program () Model Msg
