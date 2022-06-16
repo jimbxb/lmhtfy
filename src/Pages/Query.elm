@@ -17,7 +17,7 @@ type alias Model =
 type Msg
     = QueryChanged String
     | ClearLink
-    | GenerateLink
+    | CreateLink
     | CopyLink String
     | TryItOut
 
@@ -45,7 +45,7 @@ update msg model =
         ClearLink ->
             ( { model | link = Nothing }, Nop )
 
-        GenerateLink ->
+        CreateLink ->
             ( { model | link = Just <| model.query }, Nop )
 
         CopyLink id ->
@@ -60,37 +60,6 @@ view model =
     let
         emptyQuery =
             model.query == ""
-
-        ( copyButton, linkText ) =
-            case model.link of
-                Nothing ->
-                    ( [], [] )
-
-                Just l ->
-                    let
-                        params =
-                            [ UB.string "q" l ]
-
-                        linkID =
-                            "link"
-                    in
-                    ( [ S.button True
-                            [ alignRight ]
-                            { onPress = Just (CopyLink linkID)
-                            , label = text "Copy Link"
-                            }
-                      ]
-                    , [ S.text
-                            [ clip
-                            , htmlAttribute <| HA.style "flex-basis" "auto"
-                            ]
-                            [ link [ alignLeft, htmlAttribute <| HA.id linkID ]
-                                { url = UB.relative [] params
-                                , label = text <| model.url ++ UB.relative [] params
-                                }
-                            ]
-                      ]
-                    )
     in
     column
         [ spacingXY 0 20
@@ -119,25 +88,51 @@ view model =
             , alignRight
             ]
           <|
-            copyButton
-                ++ List.map (S.button (not emptyQuery) [ alignRight ])
-                    [ { onPress =
-                            Just <|
-                                if emptyQuery then
-                                    ClearLink
-
-                                else
-                                    GenerateLink
-                      , label = text "Generate Link"
-                      }
-                    , { onPress =
+            List.map (S.button (not emptyQuery) [ alignRight ])
+                [ { onPress =
+                        Just <|
                             if emptyQuery then
-                                Nothing
+                                ClearLink
 
                             else
-                                Just TryItOut
-                      , label = text "Try It Out"
-                      }
-                    ]
+                                CreateLink
+                  , label = text "Create Link"
+                  }
+                , { onPress =
+                        if emptyQuery then
+                            Nothing
+
+                        else
+                            Just TryItOut
+                  , label = text "Try It Out"
+                  }
+                ]
         ]
-            ++ linkText
+            ++ (case model.link of
+                    Nothing ->
+                        []
+
+                    Just l ->
+                        let
+                            params =
+                                [ UB.string "q" l ]
+
+                            linkID =
+                                "link"
+                        in
+                        [ S.text
+                            [ clip
+                            , htmlAttribute <| HA.style "flex-basis" "auto"
+                            ]
+                            [ link [ alignLeft, htmlAttribute <| HA.id linkID ]
+                                { url = UB.relative [] params
+                                , label = text <| model.url ++ UB.relative [] params
+                                }
+                            ]
+                        , S.button True
+                            [ alignRight ]
+                            { onPress = Just (CopyLink linkID)
+                            , label = text "Copy Link"
+                            }
+                        ]
+               )
