@@ -233,9 +233,8 @@ bottomBar { date } =
             , paddingXY 10 10
             , centerX
             , centerY
-            , Font.size 12
             ]
-            [ paragraph [ centerX ]
+            [ paragraph [ Font.center, Font.size 12 ]
                 [ text "© "
                 , S.link
                     { url = "https://github.com/jimbxb"
@@ -250,10 +249,10 @@ bottomBar { date } =
                 , text <|
                     ", 2022"
                         ++ (if year > 2022 then
-                                "-" ++ String.fromInt year ++ "."
+                                "-" ++ String.fromInt year ++ ". "
 
                             else
-                                "."
+                                ". "
                            )
                 , text "LMHTFY is not endorsed by, sponsored by, or affiliated with "
                 , S.link
