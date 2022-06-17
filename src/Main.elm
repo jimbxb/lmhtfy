@@ -146,13 +146,17 @@ now =
 view : Model -> Browser.Document Msg
 view model =
     let
-        content =
+        ( content, title ) =
             case model.page of
                 QueryPage m ->
-                    Q.view m |> Element.map QueryMsg
+                    ( Q.view m |> Element.map QueryMsg
+                    , "LMHTFY | Let Me Hoogle That For You"
+                    )
 
                 TutorialPage m ->
-                    T.view m |> Element.map TutorialMsg
+                    ( T.view m |> Element.map TutorialMsg
+                    , "LMHTFY | " ++ m.query
+                    )
     in
     { title = title
     , body =
@@ -266,11 +270,6 @@ bottomBar { date } =
                 , text "."
                 ]
             ]
-
-
-title : String
-title =
-    "LMHTFY | Let Me Hoogle That For You"
 
 
 main : Program () Model Msg
