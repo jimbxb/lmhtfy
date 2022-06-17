@@ -220,6 +220,20 @@ bottomBar { date } =
     let
         year =
             Date.year date
+
+        yearRange =
+            if year > 2022 then
+                "2022-" ++ String.fromInt year ++ ""
+
+            else
+                "2022"
+
+        name =
+            if date == Date.fromCalendarDate year Mar 15 then
+                "Jarnes Bames"
+
+            else
+                "James Barnes"
     in
     el
         [ width fill
@@ -244,20 +258,9 @@ bottomBar { date } =
                 [ text "© "
                 , S.link
                     { url = "https://github.com/jimbxb/"
-                    , label =
-                        text <|
-                            if date == Date.fromCalendarDate year Mar 15 then
-                                "Jarnes Bames, 2022"
-
-                            else
-                                "James Barnes, 2022"
+                    , label = text name
                     }
-                , text <|
-                    if year > 2022 then
-                        "-" ++ String.fromInt year ++ ". "
-
-                    else
-                        ". "
+                , text <| yearRange ++ ". "
                 , text "LMHTFY is not endorsed by, sponsored by, or affiliated with "
                 , S.link
                     { url = "https://www.haskell.org/"
