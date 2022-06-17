@@ -56,14 +56,10 @@ update msg model =
 
 view : Model -> Element Msg
 view model =
-    let
-        emptyQuery =
-            model.query == ""
-    in
     column
-        [ spacingXY 0 20
+        [ width fill
+        , spacingXY 0 20
         , paddingXY 10 0
-        , width fill
         ]
     <|
         [ S.querySearch [ width fill ]
@@ -77,6 +73,10 @@ view model =
             , alignRight
             ]
           <|
+            let
+                emptyQuery =
+                    model.query == ""
+            in
             List.map (S.button (not emptyQuery) [ alignRight ])
                 [ { onPress =
                         Just <|
@@ -109,10 +109,7 @@ view model =
                             linkID =
                                 "link"
                         in
-                        [ S.text
-                            [ clip
-                            , htmlAttribute <| HA.style "flex-basis" "auto"
-                            ]
+                        [ S.text S.clipped
                             [ link
                                 [ alignLeft
                                 , htmlAttribute <| HA.id linkID
@@ -121,10 +118,15 @@ view model =
                                 , label = text <| model.url ++ UB.relative [] params
                                 }
                             ]
-                        , S.button True
-                            [ alignRight ]
-                            { onPress = Just (CopyLink linkID)
-                            , label = text "Copy Link"
-                            }
+                        , el
+                            [ paddingXY 10 0
+                            , alignRight
+                            ]
+                          <|
+                            S.button True
+                                [ alignRight ]
+                                { onPress = Just (CopyLink linkID)
+                                , label = text "Copy Link"
+                                }
                         ]
                )

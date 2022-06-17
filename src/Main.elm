@@ -1,4 +1,4 @@
-port module Main exposing (..)
+port module Main exposing (main)
 
 import Browser
 import Browser.Navigation as Nav
@@ -10,13 +10,16 @@ import Element.Font as F
 import Element.Input as I
 import Pages.Query as Q
 import Pages.Tutorial as T
-import Style as S
+import Style as S exposing (shadow)
 import Task
 import Time exposing (Month(..))
 import Url exposing (Url)
 import Url.Builder as UB
-import Url.Parser as UParser exposing ((</>))
-import Url.Parser.Query as UQParser
+import Url.Parser as UP exposing ((</>))
+import Url.Parser.Query as UQP
+
+
+port copy : String -> Cmd msg
 
 
 type alias Model =
@@ -27,41 +30,8 @@ type alias Model =
 
 
 type Page
-    = QueryPage Q.Model
-    | TutorialPage T.Model
-
-
-port copy : String -> Cmd msg
-
-
-lmhtfy : String
-lmhtfy =
-    UB.absolute [ "lmhtfy" ] []
-
-
-init : Url -> Nav.Key -> ( Model, Cmd Msg )
-init url key =
-    let
-        model =
-            { page = QueryPage <| Q.init (Url.toString url) "" Nothing
-            , key = key
-            , date = Date.fromCalendarDate 2021 Mar 9
-            }
-    in
-    case parseUrl url of
-        Nothing ->
-            ( model, Nav.pushUrl model.key lmhtfy )
-
-        Just Nothing ->
-            ( model, now )
-
-        Just (Just q) ->
-            ( { model | page = TutorialPage <| T.init q }, now )
-
-
-parseUrl : Url -> Maybe (Maybe String)
-parseUrl url =
-    UParser.parse (UParser.s "lmhtfy" </> UParser.query (UQParser.string "q")) url
+    = Query Q.Model
+    | Tutorial T.Model
 
 
 type Msg
@@ -73,69 +43,24 @@ type Msg
     | TutorialMsg T.Msg
 
 
-update : Msg -> Model -> ( Model, Cmd Msg )
-update msg model =
-    case ( msg, model.page ) of
-        ( UrlChanged url, _ ) ->
-            init url model.key
+init : Url -> Nav.Key -> ( Model, Cmd Msg )
+init url key =
+    let
+        model =
+            { page = Query <| Q.init (Url.toString url) "" Nothing
+            , key = key
+            , date = Date.fromCalendarDate 2021 Mar 9
+            }
+    in
+    case parseUrl url of
+        Nothing ->
+            ( model, Nav.pushUrl model.key lmhtfyUrl )
 
-        ( UrlRequest req, _ ) ->
-            case req of
-                Browser.Internal url ->
-                    ( model, Nav.pushUrl model.key <| Url.toString url )
+        Just Nothing ->
+            ( model, now )
 
-                Browser.External href ->
-                    ( model, Nav.load href )
-
-        ( GoHome, _ ) ->
-            ( model, Nav.pushUrl model.key lmhtfy )
-
-        ( SetDate date, _ ) ->
-            ( { model | date = date }, Cmd.none )
-
-        ( QueryMsg qmsg, QueryPage qmodel ) ->
-            let
-                ( newQmodel, cmdMsg ) =
-                    Q.update qmsg qmodel
-
-                cmd =
-                    case cmdMsg of
-                        Q.Goto q ->
-                            Nav.pushUrl model.key <| tutorialLink q
-
-                        Q.Copy id ->
-                            copy id
-
-                        Q.Nop ->
-                            Cmd.none
-            in
-            ( { model | page = QueryPage newQmodel }, cmd )
-
-        ( TutorialMsg tmsg, TutorialPage tmodel ) ->
-            let
-                ( newTmodel, cmdMsg ) =
-                    T.update tmsg tmodel
-
-                cmd =
-                    case cmdMsg of
-                        T.Goto url ->
-                            Nav.pushUrl model.key url
-
-                        T.ExternalGoto url ->
-                            Nav.load url
-
-                        T.Nop ->
-                            Cmd.none
-            in
-            ( { model | page = TutorialPage newTmodel }, cmd )
-
-        _ ->
-            ( model, Cmd.none )
-
-
-tutorialLink : String -> String
-tutorialLink query =
-    UB.relative [] [ UB.string "q" query ]
+        Just (Just q) ->
+            ( { model | page = Tutorial <| T.init q }, now )
 
 
 now : Cmd Msg
@@ -143,128 +68,195 @@ now =
     Task.perform SetDate Date.today
 
 
+parseUrl : Url -> Maybe (Maybe String)
+parseUrl =
+    UP.parse <| UP.s lmhtfyPath </> UP.query (UQP.string queryParam)
+
+
+lmhtfyPath : String
+lmhtfyPath =
+    "lmhtfy"
+
+
+lmhtfyUrl : String
+lmhtfyUrl =
+    UB.absolute [ "lmhtfy" ] []
+
+
+queryParam : String
+queryParam =
+    "q"
+
+
+tutorialUrl : String -> String
+tutorialUrl query =
+    UB.relative [] [ UB.string queryParam query ]
+
+
+update : Msg -> Model -> ( Model, Cmd Msg )
+update msg model =
+    case ( msg, model.page ) of
+        ( UrlChanged url, _ ) ->
+            init url model.key
+
+        ( UrlRequest req, _ ) ->
+            ( model
+            , case req of
+                Browser.Internal url ->
+                    Nav.pushUrl model.key <| Url.toString url
+
+                Browser.External href ->
+                    Nav.load href
+            )
+
+        ( GoHome, _ ) ->
+            ( model, Nav.pushUrl model.key lmhtfyUrl )
+
+        ( SetDate date, _ ) ->
+            ( { model | date = date }, Cmd.none )
+
+        ( QueryMsg qmsg, Query qmodel ) ->
+            let
+                ( newQmodel, cmdMsg ) =
+                    Q.update qmsg qmodel
+            in
+            ( { model | page = Query newQmodel }
+            , case cmdMsg of
+                Q.Goto q ->
+                    Nav.pushUrl model.key <| tutorialUrl q
+
+                Q.Copy id ->
+                    copy id
+
+                Q.Nop ->
+                    Cmd.none
+            )
+
+        ( TutorialMsg tmsg, Tutorial tmodel ) ->
+            let
+                ( newTmodel, cmdMsg ) =
+                    T.update tmsg tmodel
+            in
+            ( { model | page = Tutorial newTmodel }
+            , case cmdMsg of
+                T.Goto url ->
+                    Nav.load url
+
+                T.Nop ->
+                    Cmd.none
+            )
+
+        _ ->
+            ( model, Cmd.none )
+
+
 view : Model -> Browser.Document Msg
 view model =
     let
         ( content, title ) =
             case model.page of
-                QueryPage m ->
+                Query m ->
                     ( Q.view m |> Element.map QueryMsg
                     , "LMHTFY | Let Me Hoogle That For You"
                     )
 
-                TutorialPage m ->
+                Tutorial m ->
                     ( T.view m |> Element.map TutorialMsg
                     , "LMHTFY | " ++ m.query
                     )
-    in
-    { title = title
-    , body =
-        [ layout
-            [ width fill
-            , centerX
-            , Bg.color S.lightGrey
-            , clip
-            ]
-          <|
-            column
-                [ centerX
-                , width fill
-                , height fill
-                ]
-                [ topBar model
-                , el
-                    [ paddingXY 10 20
-                    , width (fill |> maximum 800)
-                    , centerX
-                    , height fill
-                    ]
-                    content
-                , bottomBar model
-                ]
-        ]
-    }
 
-
-topBar : Model -> Element Msg
-topBar _ =
-    el
-        [ width fill
-        , height <| px 60
-        , B.widthEach { bottom = 1, top = 0, left = 0, right = 0 }
-        , B.color S.black
-        , Bg.color S.white
-        , B.shadow { blur = 10, color = S.darkGrey, offset = ( 0, 0 ), size = 2 }
-        ]
-    <|
-        row
-            [ width <| maximum 800 <| fill
-            , paddingXY 10 10
-            , height fill
-            , centerX
-            , centerY
-            ]
-            [ I.button [ focused [] ]
-                { onPress = Just GoHome
-                , label =
-                    image [ height (px 40) ]
-                        { src = "assets/lmhtfy.svg"
-                        , description = "LMHTFY Logo"
-                        }
-                }
-            ]
-
-
-bottomBar : Model -> Element Msg
-bottomBar { date } =
-    let
         year =
-            Date.year date
+            Date.year model.date
 
         yearRange =
             if year > 2022 then
-                "2022-" ++ String.fromInt year ++ ""
+                "2022-" ++ String.fromInt year
 
             else
                 "2022"
 
         name =
-            if date == Date.fromCalendarDate year Mar 15 then
+            if model.date == Date.fromCalendarDate year Mar 15 then
                 "Jarnes Bames"
 
             else
                 "James Barnes"
+
+        bar =
+            el
+                [ width fill
+                , height <| px 60
+                , B.widthEach { bottom = 1, top = 0, left = 0, right = 0 }
+                , B.color S.c.black
+                , Bg.color S.c.white
+                , B.shadow { shadow | offset = ( 0, 0 ) }
+                ]
+
+        head =
+            row
+                [ width <| maximum 800 <| fill
+                , height fill
+                , paddingXY 10 10
+                , centerX
+                , centerY
+                ]
+                [ I.button [ focused [] ]
+                    { onPress = Just GoHome
+                    , label =
+                        image [ height <| px 40 ]
+                            { src = "assets/lmhtfy.svg"
+                            , description = "LMHTFY Logo"
+                            }
+                    }
+                ]
+
+        foot =
+            row
+                [ width <| maximum 800 <| fill
+                , height fill
+                , paddingXY 10 10
+                , centerX
+                , centerY
+                ]
+                [ paragraph
+                    [ F.center
+                    , F.size 12
+                    ]
+                    [ text "© "
+                    , S.link { url = "https://www.github.com/jimbxb/", label = text name }
+                    , text <| ", " ++ yearRange ++ ". "
+                    , text "LMHTFY is not endorsed by, sponsored by, or affiliated with "
+                    , S.link { url = "https://www.haskell.org/", label = text "Haskell.org" }
+                    , text " nor "
+                    , S.link { url = "https://hoogle.haskell.org/", label = text "Hoogle" }
+                    , text "."
+                    ]
+                ]
     in
-    el
-        [ width fill
-        , height <| px 60
-        , B.widthEach { bottom = 0, top = 1, left = 0, right = 0 }
-        , B.color S.black
-        , Bg.color S.white
-        , B.shadow { blur = 10, color = S.darkGrey, offset = ( 0, 0 ), size = 2 }
+    { title = title
+    , body =
+        [ layout
+            [ width fill
+            , Bg.color S.c.lightGrey
+            , clip
+            ]
+          <|
+            column
+                [ width fill
+                , height fill
+                ]
+                [ bar head
+                , el
+                    [ width <| maximum 800 <| fill
+                    , height fill
+                    , paddingXY 10 20
+                    , centerX
+                    ]
+                    content
+                , bar foot
+                ]
         ]
-    <|
-        row
-            [ width <| maximum 800 <| fill
-            , height fill
-            , paddingXY 10 10
-            , centerX
-            , centerY
-            ]
-            [ paragraph
-                [ F.center
-                , F.size 12
-                ]
-                [ text "© "
-                , S.link { url = "https://github.com/jimbxb/", label = text name }
-                , text <| yearRange ++ ". "
-                , text "LMHTFY is not endorsed by, sponsored by, or affiliated with "
-                , S.link { url = "https://www.haskell.org/", label = text "Haskell.org" }
-                , text " nor "
-                , S.link { url = "https://hoogle.haskell.org/", label = text "Hoogle" }
-                , text "."
-                ]
-            ]
+    }
 
 
 main : Program () Model Msg

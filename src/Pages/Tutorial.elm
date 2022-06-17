@@ -1,7 +1,6 @@
 module Pages.Tutorial exposing (Model, Msg(..), OutMsg(..), init, update, view)
 
 import Element exposing (..)
-import Html.Attributes as HA
 import Style as S
 import Url.Builder as UB
 
@@ -20,8 +19,7 @@ type Stage
 
 
 type Msg
-    = LMHTFYQuery
-    | HoogleHome
+    = HoogleHome
     | HoogleQuery
     | NextStage
     | SearchChanged String
@@ -29,7 +27,6 @@ type Msg
 
 type OutMsg
     = Goto String
-    | ExternalGoto String
     | Nop
 
 
@@ -41,14 +38,11 @@ init q =
 update : Msg -> Model -> ( Model, OutMsg )
 update msg model =
     case msg of
-        LMHTFYQuery ->
-            ( model, Goto "/" )
-
         HoogleHome ->
-            ( model, ExternalGoto hoogleHome )
+            ( model, Goto hoogleHome )
 
         HoogleQuery ->
-            ( model, ExternalGoto <| hoogleQuery model.query )
+            ( model, Goto <| hoogleQuery model.query )
 
         SearchChanged s ->
             ( { model | searchQuery = s }, Nop )
@@ -78,15 +72,15 @@ view model =
             model.searchQuery == model.query
     in
     column
-        [ spacingXY 0 20
-        , width fill
+        [ width fill
         , height fill
+        , spacingXY 0 20
         ]
     <|
         [ column
-            [ spacingXY 0 20
+            [ width fill
+            , spacingXY 0 20
             , paddingXY 10 0
-            , width fill
             ]
           <|
             case model.stage of
@@ -111,10 +105,7 @@ view model =
                     ]
 
                 TypeQuery ->
-                    [ S.text
-                        [ clip
-                        , htmlAttribute <| HA.style "flex-basis" "auto"
-                        ]
+                    [ S.text S.clipped
                         [ text <| "2. Search for " ++ model.query ]
                     , S.querySearch []
                         { onChange = SearchChanged
