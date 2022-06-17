@@ -1,7 +1,6 @@
 module Pages.Query exposing (Model, Msg(..), OutMsg(..), init, update, view)
 
 import Element exposing (..)
-import Element.Input as I
 import Html.Attributes as HA
 import Style as S
 import Url.Builder as UB
@@ -67,20 +66,10 @@ view model =
         , width fill
         ]
     <|
-        [ el
-            [ spacingXY 0 20
-            , width fill
-            ]
-          <|
-            I.search S.textStyle
-                { onChange = QueryChanged
-                , text = model.query
-                , placeholder =
-                    Just <|
-                        I.placeholder [] <|
-                            text "Enter a query..."
-                , label = I.labelHidden "Query"
-                }
+        [ S.querySearch [ width fill ]
+            { onChange = QueryChanged
+            , query = model.query
+            }
         , wrappedRow
             [ width fill
             , spacingXY 20 20
@@ -124,7 +113,10 @@ view model =
                             [ clip
                             , htmlAttribute <| HA.style "flex-basis" "auto"
                             ]
-                            [ link [ alignLeft, htmlAttribute <| HA.id linkID ]
+                            [ link
+                                [ alignLeft
+                                , htmlAttribute <| HA.id linkID
+                                ]
                                 { url = UB.relative [] params
                                 , label = text <| model.url ++ UB.relative [] params
                                 }

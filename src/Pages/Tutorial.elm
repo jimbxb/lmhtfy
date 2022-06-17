@@ -1,12 +1,7 @@
 module Pages.Tutorial exposing (Model, Msg(..), OutMsg(..), init, update, view)
 
 import Element exposing (..)
-import Element.Input as I
-import Html.Attributes as HA exposing (style)
-import Simple.Animation as Animation exposing (Animation)
-import Simple.Animation.Animated as Animated
-import Simple.Animation.Property as P
-import Simple.Transition as T
+import Html.Attributes as HA
 import Style as S
 import Url.Builder as UB
 
@@ -14,7 +9,7 @@ import Url.Builder as UB
 type alias Model =
     { query : String
     , stage : Stage
-    , searchTerm : String
+    , searchQuery : String
     }
 
 
@@ -40,7 +35,7 @@ type OutMsg
 
 init : String -> Model
 init q =
-    { query = q, stage = VisitHoogle, searchTerm = "" }
+    { query = q, stage = VisitHoogle, searchQuery = "" }
 
 
 update : Msg -> Model -> ( Model, OutMsg )
@@ -56,7 +51,7 @@ update msg model =
             ( model, ExternalGoto <| hoogleQuery model.query )
 
         SearchChanged s ->
-            ( { model | searchTerm = s }, Nop )
+            ( { model | searchQuery = s }, Nop )
 
         NextStage ->
             ( { model
@@ -70,7 +65,7 @@ update msg model =
 
                         HoogleIt ->
                             VisitHoogle
-                , searchTerm = ""
+                , searchQuery = ""
               }
             , Nop
             )
@@ -80,7 +75,7 @@ view : Model -> Element Msg
 view model =
     let
         correctSearch =
-            model.searchTerm == model.query
+            model.searchQuery == model.query
     in
     column
         [ spacingXY 0 20
@@ -103,7 +98,11 @@ view model =
                             , label = text <| hoogleDomain
                             }
                         ]
-                    , el [ paddingXY 10 0, alignRight ] <|
+                    , el
+                        [ paddingXY 10 0
+                        , alignRight
+                        ]
+                      <|
                         S.button True
                             [ alignRight ]
                             { onPress = Just NextStage
@@ -117,16 +116,15 @@ view model =
                         , htmlAttribute <| HA.style "flex-basis" "auto"
                         ]
                         [ text <| "2. Search for " ++ model.query ]
-                    , I.search S.textStyle
+                    , S.querySearch []
                         { onChange = SearchChanged
-                        , text = model.searchTerm
-                        , placeholder =
-                            Just <|
-                                I.placeholder [] <|
-                                    text "Enter a query..."
-                        , label = I.labelHidden "Query"
+                        , query = model.searchQuery
                         }
-                    , el [ paddingXY 10 0, alignRight ] <|
+                    , el
+                        [ paddingXY 10 0
+                        , alignRight
+                        ]
+                      <|
                         S.button correctSearch
                             [ alignRight ]
                             { onPress =

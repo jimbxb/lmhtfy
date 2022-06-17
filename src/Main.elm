@@ -4,9 +4,9 @@ import Browser
 import Browser.Navigation as Nav
 import Date exposing (Date)
 import Element exposing (..)
-import Element.Background as Background
-import Element.Border as Border
-import Element.Font as Font
+import Element.Background as Bg
+import Element.Border as B
+import Element.Font as F
 import Element.Input as I
 import Pages.Query as Q
 import Pages.Tutorial as T
@@ -163,7 +163,7 @@ view model =
         [ layout
             [ width fill
             , centerX
-            , Background.color S.lightGrey
+            , Bg.color S.lightGrey
             , clip
             ]
           <|
@@ -190,21 +190,21 @@ topBar : Model -> Element Msg
 topBar _ =
     el
         [ width fill
-        , height (px 60)
-        , Border.widthEach { bottom = 1, top = 0, left = 0, right = 0 }
-        , Border.color S.black
-        , Background.color S.white
-        , Border.shadow { blur = 10, color = S.darkGrey, offset = ( 0, 0 ), size = 2 }
+        , height <| px 60
+        , B.widthEach { bottom = 1, top = 0, left = 0, right = 0 }
+        , B.color S.black
+        , Bg.color S.white
+        , B.shadow { blur = 10, color = S.darkGrey, offset = ( 0, 0 ), size = 2 }
         ]
     <|
         row
-            [ width (fill |> maximum 800)
+            [ width <| maximum 800 <| fill
             , paddingXY 10 10
             , height fill
             , centerX
             , centerY
             ]
-            [ I.button []
+            [ I.button [ focused [] ]
                 { onPress = Just GoHome
                 , label =
                     image [ height (px 40) ]
@@ -223,40 +223,41 @@ bottomBar { date } =
     in
     el
         [ width fill
-        , height (px 60)
-        , Border.widthEach { bottom = 0, top = 1, left = 0, right = 0 }
-        , Border.color S.black
-        , Background.color S.white
-        , Border.shadow { blur = 10, color = S.darkGrey, offset = ( 0, 0 ), size = 2 }
+        , height <| px 60
+        , B.widthEach { bottom = 0, top = 1, left = 0, right = 0 }
+        , B.color S.black
+        , Bg.color S.white
+        , B.shadow { blur = 10, color = S.darkGrey, offset = ( 0, 0 ), size = 2 }
         ]
     <|
         row
-            [ width (fill |> maximum 800)
+            [ width <| maximum 800 <| fill
             , height fill
             , paddingXY 10 10
             , centerX
             , centerY
             ]
-            [ paragraph [ Font.center, Font.size 12 ]
+            [ paragraph
+                [ F.center
+                , F.size 12
+                ]
                 [ text "© "
                 , S.link
-                    { url = "https://github.com/jimbxb"
+                    { url = "https://github.com/jimbxb/"
                     , label =
                         text <|
                             if date == Date.fromCalendarDate year Mar 15 then
-                                "Jarnes Bames"
+                                "Jarnes Bames, 2022"
 
                             else
-                                "James Barnes"
+                                "James Barnes, 2022"
                     }
                 , text <|
-                    ", 2022"
-                        ++ (if year > 2022 then
-                                "-" ++ String.fromInt year ++ ". "
+                    if year > 2022 then
+                        "-" ++ String.fromInt year ++ ". "
 
-                            else
-                                ". "
-                           )
+                    else
+                        ". "
                 , text "LMHTFY is not endorsed by, sponsored by, or affiliated with "
                 , S.link
                     { url = "https://www.haskell.org/"
