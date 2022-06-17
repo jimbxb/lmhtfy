@@ -256,21 +256,12 @@ bottomBar { date } =
                 , F.size 12
                 ]
                 [ text "© "
-                , S.link
-                    { url = "https://github.com/jimbxb/"
-                    , label = text name
-                    }
+                , S.link { url = "https://github.com/jimbxb/", label = text name }
                 , text <| yearRange ++ ". "
                 , text "LMHTFY is not endorsed by, sponsored by, or affiliated with "
-                , S.link
-                    { url = "https://www.haskell.org/"
-                    , label = text "Haskell.org"
-                    }
+                , S.link { url = "https://www.haskell.org/", label = text "Haskell.org" }
                 , text " nor "
-                , S.link
-                    { url = "https://hoogle.haskell.org/"
-                    , label = text "Hoogle"
-                    }
+                , S.link { url = "https://hoogle.haskell.org/", label = text "Hoogle" }
                 , text "."
                 ]
             ]
