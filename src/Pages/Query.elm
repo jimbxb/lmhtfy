@@ -2,7 +2,6 @@ port module Pages.Query exposing (Model, Msg(..), init, update, view)
 
 import Browser.Navigation as Nav
 import Element exposing (..)
-import Element.Background as Bg
 import Element.Font as F
 import Element.Input as I
 import Html.Attributes as HA
