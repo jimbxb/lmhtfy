@@ -18,13 +18,13 @@ import Utils exposing (..)
 
 
 type alias Model =
-    { page : Page
+    { page : PageModel
     , key : Nav.Key
     , date : Date
     }
 
 
-type Page
+type PageModel
     = Query Q.Model
     | Tutorial T.Model
 
@@ -84,18 +84,12 @@ update msg model =
             ( { model | date = date }, Cmd.none )
 
         ( QueryMsg qmsg, Query qmodel ) ->
-            let
-                ( newQmodel, cmd_ ) =
-                    Q.update qmsg qmodel
-            in
-            ( { model | page = Query newQmodel }, cmd_ )
+            Tuple.mapFirst (\m -> { model | page = Query m }) <|
+                Q.update qmsg qmodel
 
         ( TutorialMsg tmsg, Tutorial tmodel ) ->
-            let
-                ( newTmodel, cmdMsg ) =
-                    T.update TutorialMsg tmsg tmodel
-            in
-            ( { model | page = Tutorial newTmodel }, cmdMsg )
+            Tuple.mapFirst (\m -> { model | page = Tutorial m }) <|
+                T.update TutorialMsg tmsg tmodel
 
         _ ->
             ( model, Cmd.none )

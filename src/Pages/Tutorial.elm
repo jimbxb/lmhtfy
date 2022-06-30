@@ -4,7 +4,6 @@ import Browser.Navigation as Nav
 import Delay
 import Element exposing (..)
 import Element.Font as F
-import Pages.Query exposing (Msg(..))
 import Style as S
 import Url.Builder as UB
 
@@ -25,10 +24,9 @@ type Stage
 
 
 type Msg
-    = HoogleHome
-    | HoogleQuery
-    | NextStage
+    = HoogleQuery
     | SearchChanged String
+    | NextStage
 
 
 init : Nav.Key -> String -> Bool -> Model
@@ -44,9 +42,6 @@ init key query auto =
 update : (Msg -> a) -> Msg -> Model -> ( Model, Cmd a )
 update tick msg model =
     case msg of
-        HoogleHome ->
-            ( model, Nav.load hoogleHome )
-
         HoogleQuery ->
             ( model, Nav.load <| hoogleQuery model.query )
 
@@ -82,12 +77,7 @@ update tick msg model =
                         HoogleIt ->
                             ( VisitHoogle, Cmd.none )
             in
-            ( { model
-                | stage = nextStage
-                , searchQuery = ""
-              }
-            , cmd
-            )
+            ( { model | stage = nextStage, searchQuery = "" }, cmd )
 
 
 view : Model -> Element Msg
@@ -160,7 +150,7 @@ view model =
                     ]
 
                 HoogleIt ->
-                    [ S.text [] [ text "3. That's it. Hoogle It." ]
+                    [ S.text [] [ text "3. That's it. Hoogle it." ]
                     , wrappedRow
                         [ spacingXY 10 10
                         , alignRight
