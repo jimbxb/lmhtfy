@@ -1,12 +1,18 @@
-module Pages.Tutorial exposing (Model, Msg(..), OutMsg(..), init, update, view)
+module Pages.Tutorial exposing (Model, Msg(..), init, update, view)
 
+import Browser.Navigation as Nav
+import Delay
 import Element exposing (..)
+import Element.Font as F
+import Pages.Query exposing (Msg(..))
 import Style as S
 import Url.Builder as UB
 
 
 type alias Model =
-    { query : String
+    { key : Nav.Key
+    , query : String
+    , auto : Bool
     , stage : Stage
     , searchQuery : String
     }
@@ -25,43 +31,62 @@ type Msg
     | SearchChanged String
 
 
-type OutMsg
-    = Goto String
-    | Nop
+init : Nav.Key -> String -> Bool -> Model
+init key query auto =
+    { key = key
+    , query = query
+    , stage = VisitHoogle
+    , searchQuery = ""
+    , auto = auto
+    }
 
 
-init : String -> Model
-init q =
-    { query = q, stage = VisitHoogle, searchQuery = "" }
-
-
-update : Msg -> Model -> ( Model, OutMsg )
-update msg model =
+update : (Msg -> a) -> Msg -> Model -> ( Model, Cmd a )
+update tick msg model =
     case msg of
         HoogleHome ->
-            ( model, Goto hoogleHome )
+            ( model, Nav.load hoogleHome )
 
         HoogleQuery ->
-            ( model, Goto <| hoogleQuery model.query )
+            ( model, Nav.load <| hoogleQuery model.query )
 
         SearchChanged s ->
-            ( { model | searchQuery = s }, Nop )
+            ( { model | searchQuery = s }, Cmd.none )
 
         NextStage ->
-            ( { model
-                | stage =
+            let
+                ( nextStage, cmd ) =
                     case model.stage of
                         VisitHoogle ->
-                            TypeQuery
+                            ( TypeQuery
+                            , Delay.sequenceIf model.auto <|
+                                (List.map
+                                    (\i ->
+                                        ( if i == 1 then
+                                            1000
+
+                                          else
+                                            500
+                                        , tick <| SearchChanged <| String.left i model.query
+                                        )
+                                    )
+                                 <|
+                                    List.range 1 <|
+                                        String.length model.query
+                                )
+                            )
 
                         TypeQuery ->
-                            HoogleIt
+                            ( HoogleIt, Cmd.none )
 
                         HoogleIt ->
-                            VisitHoogle
+                            ( VisitHoogle, Cmd.none )
+            in
+            ( { model
+                | stage = nextStage
                 , searchQuery = ""
               }
-            , Nop
+            , cmd
             )
 
 
@@ -80,7 +105,6 @@ view model =
         [ column
             [ width fill
             , spacingXY 0 20
-            , paddingXY 10 0
             ]
           <|
             case model.stage of
@@ -92,11 +116,7 @@ view model =
                             , label = text <| hoogleDomain
                             }
                         ]
-                    , el
-                        [ paddingXY 10 0
-                        , alignRight
-                        ]
-                      <|
+                    , el [ alignRight ] <|
                         S.button True
                             [ alignRight ]
                             { onPress = Just NextStage
@@ -107,15 +127,26 @@ view model =
                 TypeQuery ->
                     [ S.text S.clipped
                         [ text <| "2. Search for " ++ model.query ]
-                    , S.querySearch []
-                        { onChange = SearchChanged
-                        , query = model.searchQuery
-                        }
-                    , el
-                        [ paddingXY 10 0
-                        , alignRight
-                        ]
-                      <|
+                    , if model.auto then
+                        let
+                            ( sty, txt ) =
+                                if correctSearch then
+                                    ( [], model.query )
+
+                                else if model.searchQuery == "" then
+                                    ( [ F.color S.grey ], "..." )
+
+                                else
+                                    ( [], model.searchQuery )
+                        in
+                        S.text (sty ++ S.clipped) [ text txt ]
+
+                      else
+                        S.querySearch []
+                            { onChange = SearchChanged
+                            , query = model.searchQuery
+                            }
+                    , el [ alignRight ] <|
                         S.button correctSearch
                             [ alignRight ]
                             { onPress =
@@ -129,10 +160,9 @@ view model =
                     ]
 
                 HoogleIt ->
-                    [ S.text [] [ text "3. That's it. You're done. Hoogle It." ]
+                    [ S.text [] [ text "3. That's it. Hoogle It." ]
                     , wrappedRow
                         [ spacingXY 10 10
-                        , paddingXY 10 0
                         , alignRight
                         ]
                         [ S.button True

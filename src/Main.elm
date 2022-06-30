@@ -1,4 +1,4 @@
-port module Main exposing (main)
+module Main exposing (main)
 
 import Browser
 import Browser.Navigation as Nav
@@ -14,12 +14,7 @@ import Style as S exposing (shadow)
 import Task
 import Time exposing (Month(..))
 import Url exposing (Url)
-import Url.Builder as UB
-import Url.Parser as UP exposing ((</>))
-import Url.Parser.Query as UQP
-
-
-port copy : String -> Cmd msg
+import Utils exposing (..)
 
 
 type alias Model =
@@ -46,51 +41,24 @@ type Msg
 init : Url -> Nav.Key -> ( Model, Cmd Msg )
 init url key =
     let
-        model =
-            { page = Query <| Q.init (Url.toString url) "" Nothing
+        model params =
+            { page =
+                case params.query of
+                    Nothing ->
+                        Query <| Q.init (Url.toString url) key "" params.auto
+
+                    Just query ->
+                        Tutorial <| T.init key query params.auto
             , key = key
             , date = Date.fromCalendarDate 2021 Mar 9
             }
     in
     case parseUrl url of
+        Just params ->
+            ( model params, Task.perform SetDate Date.today )
+
         Nothing ->
-            ( model, Nav.pushUrl model.key lmhtfyUrl )
-
-        Just Nothing ->
-            ( model, now )
-
-        Just (Just q) ->
-            ( { model | page = Tutorial <| T.init q }, now )
-
-
-now : Cmd Msg
-now =
-    Task.perform SetDate Date.today
-
-
-parseUrl : Url -> Maybe (Maybe String)
-parseUrl =
-    UP.parse <| UP.s lmhtfyPath </> UP.query (UQP.string queryParam)
-
-
-lmhtfyPath : String
-lmhtfyPath =
-    "lmhtfy"
-
-
-lmhtfyUrl : String
-lmhtfyUrl =
-    UB.absolute [ "lmhtfy" ] []
-
-
-queryParam : String
-queryParam =
-    "q"
-
-
-tutorialUrl : String -> String
-tutorialUrl query =
-    UB.relative [] [ UB.string queryParam query ]
+            ( model { query = Nothing, auto = False }, Nav.pushUrl key lmhtfyUrl )
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -117,34 +85,17 @@ update msg model =
 
         ( QueryMsg qmsg, Query qmodel ) ->
             let
-                ( newQmodel, cmdMsg ) =
+                ( newQmodel, cmd_ ) =
                     Q.update qmsg qmodel
             in
-            ( { model | page = Query newQmodel }
-            , case cmdMsg of
-                Q.Goto q ->
-                    Nav.pushUrl model.key <| tutorialUrl q
-
-                Q.Copy id ->
-                    copy id
-
-                Q.Nop ->
-                    Cmd.none
-            )
+            ( { model | page = Query newQmodel }, cmd_ )
 
         ( TutorialMsg tmsg, Tutorial tmodel ) ->
             let
                 ( newTmodel, cmdMsg ) =
-                    T.update tmsg tmodel
+                    T.update TutorialMsg tmsg tmodel
             in
-            ( { model | page = Tutorial newTmodel }
-            , case cmdMsg of
-                T.Goto url ->
-                    Nav.load url
-
-                T.Nop ->
-                    Cmd.none
-            )
+            ( { model | page = Tutorial newTmodel }, cmdMsg )
 
         _ ->
             ( model, Cmd.none )
@@ -187,8 +138,8 @@ view model =
                 [ width fill
                 , height <| px 60
                 , B.widthEach { bottom = 1, top = 0, left = 0, right = 0 }
-                , B.color S.c.black
-                , Bg.color S.c.white
+                , B.color S.black
+                , Bg.color S.white
                 , B.shadow { shadow | offset = ( 0, 0 ) }
                 ]
 
@@ -237,7 +188,7 @@ view model =
     , body =
         [ layout
             [ width fill
-            , Bg.color S.c.lightGrey
+            , Bg.color S.lightGrey
             , clip
             ]
           <|

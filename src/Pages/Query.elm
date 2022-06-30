@@ -1,57 +1,66 @@
-module Pages.Query exposing (Model, Msg(..), OutMsg(..), init, update, view)
+port module Pages.Query exposing (Model, Msg(..), init, update, view)
 
+import Browser.Navigation as Nav
 import Element exposing (..)
+import Element.Background as Bg
+import Element.Font as F
+import Element.Input as I
 import Html.Attributes as HA
 import Style as S
-import Url.Builder as UB
+import Utils exposing (..)
+
+
+port copy : String -> Cmd msg
 
 
 type alias Model =
     { url : String
+    , key : Nav.Key
+    , auto : Bool
     , query : String
-    , link : Maybe String
+    , link : Maybe { query : String, auto : Bool }
     }
 
 
 type Msg
     = QueryChanged String
+    | ToggleAuto Bool
     | ClearLink
     | CreateLink
     | CopyLink String
     | TryItOut
 
 
-type OutMsg
-    = Goto String
-    | Copy String
-    | Nop
-
-
-init : String -> String -> Maybe String -> Model
-init url query link =
+init : String -> Nav.Key -> String -> Bool -> Model
+init url key query auto =
     { url = url
+    , key = key
     , query = query
-    , link = link
+    , auto = auto
+    , link = Nothing
     }
 
 
-update : Msg -> Model -> ( Model, OutMsg )
+update : Msg -> Model -> ( Model, Cmd a )
 update msg model =
     case msg of
         QueryChanged q ->
-            ( { model | query = q }, Nop )
+            ( { model | query = q }, Cmd.none )
+
+        ToggleAuto t ->
+            ( { model | auto = t }, Cmd.none )
 
         ClearLink ->
-            ( { model | link = Nothing }, Nop )
+            ( { model | link = Nothing }, Cmd.none )
 
         CreateLink ->
-            ( { model | link = Just <| model.query }, Nop )
+            ( { model | link = Just <| { query = model.query, auto = model.auto } }, Cmd.none )
 
         CopyLink id ->
-            ( model, Copy id )
+            ( model, copy id )
 
         TryItOut ->
-            ( model, Goto model.query )
+            ( model, Nav.pushUrl model.key <| tutorialUrl model.query model.auto )
 
 
 view : Model -> Element Msg
@@ -59,7 +68,6 @@ view model =
     column
         [ width fill
         , spacingXY 0 20
-        , paddingXY 10 0
         ]
     <|
         [ S.querySearch [ width fill ]
@@ -69,7 +77,6 @@ view model =
         , wrappedRow
             [ width fill
             , spacingXY 20 20
-            , paddingXY 10 0
             , alignRight
             ]
           <|
@@ -77,35 +84,45 @@ view model =
                 emptyQuery =
                     model.query == ""
             in
-            List.map (S.button (not emptyQuery) [ alignRight ])
-                [ { onPress =
-                        Just <|
+            S.text
+                [ width shrink
+                , alignRight
+                ]
+                [ I.checkbox [ F.color S.darkPurple ]
+                    { onChange = ToggleAuto
+                    , icon = S.checkbox
+                    , checked = model.auto
+                    , label =
+                        I.labelRight []
+                            (text "Auto?")
+                    }
+                ]
+                :: List.map (S.button (not emptyQuery) [ alignRight ])
+                    [ { onPress =
+                            Just <|
+                                if emptyQuery then
+                                    ClearLink
+
+                                else
+                                    CreateLink
+                      , label = text "Create Link"
+                      }
+                    , { onPress =
                             if emptyQuery then
-                                ClearLink
+                                Nothing
 
                             else
-                                CreateLink
-                  , label = text "Create Link"
-                  }
-                , { onPress =
-                        if emptyQuery then
-                            Nothing
-
-                        else
-                            Just TryItOut
-                  , label = text "Try It Out"
-                  }
-                ]
+                                Just TryItOut
+                      , label = text "Try It Out"
+                      }
+                    ]
         ]
             ++ (case model.link of
                     Nothing ->
                         []
 
-                    Just l ->
+                    Just { query, auto } ->
                         let
-                            params =
-                                [ UB.string "q" l ]
-
                             linkID =
                                 "link"
                         in
@@ -114,15 +131,11 @@ view model =
                                 [ alignLeft
                                 , htmlAttribute <| HA.id linkID
                                 ]
-                                { url = UB.relative [] params
-                                , label = text <| model.url ++ UB.relative [] params
+                                { url = tutorialUrl query auto
+                                , label = text <| externalTutorialUrl model.url query auto
                                 }
                             ]
-                        , el
-                            [ paddingXY 10 0
-                            , alignRight
-                            ]
-                          <|
+                        , el [ alignRight ] <|
                             S.button True
                                 [ alignRight ]
                                 { onPress = Just (CopyLink linkID)
