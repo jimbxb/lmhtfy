@@ -66,7 +66,7 @@ update tick msg model =
                                             1000
 
                                           else
-                                            500
+                                            min 500 <| 5000 // String.length model.query
                                         , tick <| SearchChanged <| String.left i model.query
                                         )
                                     )
