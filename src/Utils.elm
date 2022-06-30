@@ -48,8 +48,8 @@ autoParam =
     "auto"
 
 
-tutorialUrl : String -> Bool -> String
-tutorialUrl query auto =
+internalTutorialUrl : String -> Bool -> String
+internalTutorialUrl query auto =
     UB.relative [] <| tutorialUrlParams query auto
 
 
@@ -58,9 +58,9 @@ externalTutorialUrl url query auto =
     let
         ( url_, params ) =
             case Url.fromString url of
-                Just n ->
-                    ( String.dropRight 1 <| Url.toString <| { n | query = Nothing, path = "" }
-                    , List.tail <| String.split "/" n.path
+                Just u ->
+                    ( Url.toString <| { u | query = Nothing, path = "" }
+                    , List.tail <| String.split "/" u.path
                     )
 
                 Nothing ->

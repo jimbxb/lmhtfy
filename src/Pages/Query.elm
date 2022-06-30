@@ -59,7 +59,7 @@ update msg model =
             ( model, copy id )
 
         TryItOut ->
-            ( model, Nav.pushUrl model.key <| tutorialUrl model.query model.auto )
+            ( model, Nav.pushUrl model.key <| internalTutorialUrl model.query model.auto )
 
 
 view : Model -> Element Msg
@@ -130,7 +130,7 @@ view model =
                                 [ alignLeft
                                 , htmlAttribute <| HA.id linkID
                                 ]
-                                { url = tutorialUrl query auto
+                                { url = internalTutorialUrl query auto
                                 , label = text <| externalTutorialUrl model.url query auto
                                 }
                             ]
