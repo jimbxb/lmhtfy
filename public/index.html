@@ -12,7 +12,9 @@
     -->
     <link rel="manifest" href="%PUBLIC_URL%/manifest.json">
     <link rel="manifest" href="%PUBLIC_URL%/favicon.ico">
-    <title>LMHTFY | Let Me Hoogle That For You</title>
+    <title>
+        <?php echo isset($_GET['query']) ? $_GET['query'] . '| LMHTFY':'LMHTFY | Let Me Hoogle That For You';?>
+    </title>
 </head>
 
 <body>

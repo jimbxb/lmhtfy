@@ -107,7 +107,7 @@ view model =
 
                 Tutorial m ->
                     ( T.view m |> Element.map TutorialMsg
-                    , "LMHTFY | " ++ m.query
+                    , m.query ++ " | LMHTFY"
                     )
 
         year =
